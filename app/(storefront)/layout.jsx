@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { CartProvider } from "@/context/CartContext";
@@ -12,7 +13,9 @@ export default function StorefrontLayout({ children }) {
     <div className="site-scope">
       <AuthProvider>
         <CartProvider>
-          <Header />
+          <Suspense fallback={null}>
+            <Header />
+          </Suspense>
           {children}
           <Footer />
           <ToastProvider />

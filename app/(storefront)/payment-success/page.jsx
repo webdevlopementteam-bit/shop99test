@@ -1,5 +1,10 @@
+import { Suspense } from "react";
 import PaymentSuccess from "@/components/PaymentSuccess";
 
 export default function Page() {
-  return <PaymentSuccess />;
+  return (
+    <Suspense fallback={null}>
+      <PaymentSuccess />
+    </Suspense>
+  );
 }

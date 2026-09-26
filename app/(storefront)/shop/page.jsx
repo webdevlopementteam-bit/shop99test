@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import ShopPage from "@/components/Shop";
 import { buildPageMetadata } from "@/lib/buildPageMetadata";
 
@@ -11,5 +12,9 @@ export async function generateMetadata({ searchParams }) {
 }
 
 export default function Page() {
-  return <ShopPage />;
+  return (
+    <Suspense fallback={null}>
+      <ShopPage />
+    </Suspense>
+  );
 }

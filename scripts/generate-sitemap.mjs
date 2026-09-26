@@ -69,6 +69,14 @@ async function safeFetchJson(url, label) {
       console.warn(`⚠️  ${label} fetch failed: ${res.status} ${res.statusText}`);
       return null;
     }
+    // A non-JSON body (e.g. an SPA's index.html served for /api/*) means
+    // API_BASE_URL isn't pointing at the API — fail clearly instead of
+    // letting res.json() throw on "<!doctype".
+    const type = res.headers.get("content-type") || "";
+    if (!type.includes("application/json")) {
+      console.warn(`⚠️  ${label} returned ${type || "no content-type"}, not JSON — check SITEMAP_API_URL (${API_BASE_URL})`);
+      return null;
+    }
     return await res.json();
   } catch (err) {
     console.warn(`⚠️  ${label} fetch error:`, err.message);
@@ -205,6 +213,13 @@ async function generateSitemap() {
       })
     );
   });
+
+  // Don't clobber a good sitemap with a static-pages-only one when the API
+  // was unreachable/misconfigured.
+  if (categories.length + brands.length + products.length === 0) {
+    console.warn(`⚠️  No dynamic URLs fetched — keeping existing ${OUTPUT_PATH}`);
+    return;
+  }
 
   const xml = buildSitemapXml(entries);
 
