@@ -1,0 +1,20 @@
+User-agent: *
+Allow: /
+
+# Account / transactional pages — no SEO value, nothing to index
+Disallow: /login
+Disallow: /register
+Disallow: /account
+Disallow: /cart
+Disallow: /checkout
+Disallow: /wishlist
+Disallow: /payment-success
+Disallow: /payment-failure
+
+# Admin panel routes served from this same app
+Disallow: /admin
+Disallow: /attributes
+Disallow: /category-attribute
+Disallow: /product-attribute
+
+Sitemap: https://www.shop99.co.in/sitemap.xml

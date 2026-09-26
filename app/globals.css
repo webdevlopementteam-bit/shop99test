@@ -1,0 +1,328 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'inter';
+  src: url('/fonts/Inter_18pt-SemiBold.ttf') format('truetype');
+}
+
+/* Storefront-only reset — scoped to .site-scope so it doesn't leak into the
+   admin panel, which shares this stylesheet but relies on Tailwind's normal
+   color inheritance (text-white/text-gray-* on ancestors) instead.
+   :where() keeps this at zero specificity (same as the original bare `*`
+   selector) so it never outranks an explicit Tailwind color class like the
+   footer's text-white — only fills in for elements with no color of their own. */
+:where(.site-scope, .site-scope *){
+  margin:0;
+  padding:0;
+  font-family: 'inter',sans-serif;
+  color:#023350;
+}
+
+.slick-track {
+  margin-left: 0 !important;
+}
+
+
+/* Custom Responsive Container */
+.mx-responsive {
+  margin-left: 16px;
+  margin-right: 16px;
+}
+
+@media (min-width: 640px) {
+  .mx-responsive {
+    margin-left: 40px;
+    margin-right: 40px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .mx-responsive {
+    margin-left: 96px;
+    margin-right: 96px;
+  }
+}
+
+
+
+
+/* bubble button */
+.bubble-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all .25s ease;
+}
+.bubble-btn::before,
+.bubble-btn::after {
+  content: "";
+  position: absolute;
+  width: 160%;
+  height: 160%;
+  left: -30%;
+  pointer-events: none;
+  opacity: 0;
+  background-repeat: no-repeat;
+}
+.bubble-btn:hover::before {
+  opacity: 1;
+  background-image:
+    radial-gradient(circle, #ff7a00 8%, transparent 9%),
+    radial-gradient(circle, #ff7a00 8%, transparent 9%),
+    radial-gradient(circle, #ff7a00 8%, transparent 9%);
+  background-size: 12px 12px;
+  animation: bubbles-top .6s ease-out forwards;
+}
+.bubble-btn:hover::after {
+  opacity: 1;
+  background-image:
+    radial-gradient(circle, #ff7a00 8%, transparent 9%),
+    radial-gradient(circle, #ff7a00 8%, transparent 9%),
+    radial-gradient(circle, #ff7a00 8%, transparent 9%);
+  background-size: 12px 12px;
+  animation: bubbles-bottom .6s ease-out forwards;
+}
+@keyframes bubbles-top {
+  0% { background-position: 20% 80%, 50% 80%, 80% 80%; }
+  100% { background-position: 20% -20%, 50% -30%, 80% -25%; }
+}
+@keyframes bubbles-bottom {
+  0% { background-position: 20% 0%, 50% 0%, 80% 0%; }
+  100% { background-position: 20% 120%, 50% 130%, 80% 125%; }
+}
+
+/* ========================= icon buttons ==================== */
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  background: white;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .2s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,.08);
+}
+.icon-btn:hover {
+  background: #f97316; /* orange-500 */
+  color: white;
+  transform: scale(1.1);
+}
+
+
+/* shop icon */
+
+.shop-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s;
+  border: 1px solid transparent;
+}
+
+.shop-icon-btn:hover {
+  background: white;
+  border: 1px solid #ff7300;
+  box-shadow: 0 0 10px rgba(255,115,0,0.6);
+  transform: scale(1.1);
+}
+
+.shop-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s;
+  border: 1px solid transparent;
+}
+
+.shop-icon-btn:hover {
+  border: 1px solid #ff7300;
+  box-shadow: 0 0 10px rgba(255,115,0,0.6);
+  transform: scale(1.1);
+}
+
+
+/* latest product shop icon */
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  background: white;
+  border: .5px solid #f97316;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  color: #f97316;
+}
+
+/* 🔥 important */
+.icon-btn i {
+  color: inherit;
+  transition: 0.3s;
+}
+
+/* hover */
+.icon-btn:hover {
+  background: #f97316;
+  color: white;
+  transform: scale(1.1);
+}
+
+
+
+/* contact us */
+/* reusable input */
+.input-style {
+  width: 100%;
+  padding: 16px 18px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  outline: none;
+  transition: 0.3s;
+}
+
+.input-style:focus {
+  border-color: #f97316;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+}
+
+/* button */
+.primary-btn {
+  background: #f97316;
+  color: white;
+  padding: 14px 60px;
+  border-radius: 10px;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.primary-btn:hover {
+  background: #ea580c;
+  transform: translateY(-2px);
+}
+
+
+/* slick  */
+.slick-slider {
+  width: 100% !important;
+}
+
+.slick-list {
+  width: 100% !important;
+  overflow: hidden !important;
+}
+
+.slick-track {
+  display: flex !important;
+}
+.slick-slide > div {
+  height: 100%;
+}
+/* Default arrow size */
+.slick-prev:before,
+.slick-next:before {
+  font-size: 24px;
+}
+
+/* Mobile arrow size */
+@media (max-width: 640px) {
+  .slick-prev:before,
+  .slick-next:before {
+    font-size: 14px;
+  }
+}
+
+
+
+/* ===== Scrollbar Width ===== */
+::-webkit-scrollbar {
+  width: 5px;   /* 👈 thickness control */
+  height: 5px;
+}
+
+/* ===== Track (background) ===== */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+/* ===== Thumb (scroll handle) ===== */
+::-webkit-scrollbar-thumb {
+  background: #FF6B00;   /* 👈 color change */
+  border-radius: 10px;
+}
+
+/* ===== Hover effect ===== */
+::-webkit-scrollbar-thumb:hover {
+  background: #153979;
+}
+
+/* ===== Blog rich-text content (from admin Jodit editor) ===== */
+.blog-content {
+  color: #374151;
+  line-height: 1.8;
+}
+.blog-content h1,
+.blog-content h2,
+.blog-content h3,
+.blog-content h4 {
+  color: #111827;
+  font-weight: 600;
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.3;
+}
+.blog-content h1 { font-size: 1.75rem; }
+.blog-content h2 { font-size: 1.5rem; }
+.blog-content h3 { font-size: 1.25rem; }
+.blog-content h4 { font-size: 1.1rem; }
+.blog-content p {
+  margin-bottom: 1rem;
+}
+.blog-content ul,
+.blog-content ol {
+  margin: 0 0 1rem 1.25rem;
+  padding-left: 1rem;
+}
+.blog-content ul { list-style: disc; }
+.blog-content ol { list-style: decimal; }
+.blog-content li {
+  margin-bottom: 0.35rem;
+}
+.blog-content a {
+  color: #ea580c;
+  text-decoration: underline;
+}
+.blog-content img {
+  max-width: 100%;
+  border-radius: 0.75rem;
+  margin: 1.25rem 0;
+}
+.blog-content blockquote {
+  border-left: 3px solid #f97316;
+  padding-left: 1rem;
+  color: #6b7280;
+  font-style: italic;
+  margin: 1.25rem 0;
+}
+.blog-content strong { font-weight: 600; }
+.blog-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.25rem 0;
+}
+.blog-content table td,
+.blog-content table th {
+  border: 1px solid #e5e7eb;
+  padding: 0.5rem 0.75rem;
+}

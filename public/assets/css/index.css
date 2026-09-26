@@ -1,0 +1,166 @@
+
+
+/* bubble button */
+.bubble-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all .25s ease;
+}
+.bubble-btn::before,
+.bubble-btn::after {
+  content: "";
+  position: absolute;
+  width: 160%;
+  height: 160%;
+  left: -30%;
+  pointer-events: none;
+  opacity: 0;
+  background-repeat: no-repeat;
+}
+.bubble-btn:hover::before {
+  opacity: 1;
+  background-image:
+    radial-gradient(circle, #ff7a00 8%, transparent 9%),
+    radial-gradient(circle, #ff7a00 8%, transparent 9%),
+    radial-gradient(circle, #ff7a00 8%, transparent 9%);
+  background-size: 12px 12px;
+  animation: bubbles-top .6s ease-out forwards;
+}
+.bubble-btn:hover::after {
+  opacity: 1;
+  background-image:
+    radial-gradient(circle, #ff7a00 8%, transparent 9%),
+    radial-gradient(circle, #ff7a00 8%, transparent 9%),
+    radial-gradient(circle, #ff7a00 8%, transparent 9%);
+  background-size: 12px 12px;
+  animation: bubbles-bottom .6s ease-out forwards;
+}
+@keyframes bubbles-top {
+  0% { background-position: 20% 80%, 50% 80%, 80% 80%; }
+  100% { background-position: 20% -20%, 50% -30%, 80% -25%; }
+}
+@keyframes bubbles-bottom {
+  0% { background-position: 20% 0%, 50% 0%, 80% 0%; }
+  100% { background-position: 20% 120%, 50% 130%, 80% 125%; }
+}
+
+/* ========================= icon buttons ==================== */
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  background: white;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .2s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,.08);
+}
+.icon-btn:hover {
+  background: #f97316; /* orange-500 */
+  color: white;
+  transform: scale(1.1);
+}
+
+
+/* shop icon */
+
+.shop-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s;
+  border: 1px solid transparent;
+}
+
+.shop-icon-btn:hover {
+  background: white;
+  border: 1px solid #ff7300;
+  box-shadow: 0 0 10px rgba(255,115,0,0.6);
+  transform: scale(1.1);
+}
+
+.shop-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s;
+  border: 1px solid transparent;
+}
+
+.shop-icon-btn:hover {
+  border: 1px solid #ff7300;
+  box-shadow: 0 0 10px rgba(255,115,0,0.6);
+  transform: scale(1.1);
+}
+
+
+/* latest product shop icon */
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  background: white;
+  border: .5px solid #f97316;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  color: #f97316;
+}
+
+/* 🔥 important */
+.icon-btn i {
+  color: inherit;
+  transition: 0.3s;
+}
+
+/* hover */
+.icon-btn:hover {
+  background: #f97316;
+  color: white;
+  transform: scale(1.1);
+}
+
+
+
+/* contact us */
+/* reusable input */
+.input-style {
+  width: 100%;
+  padding: 16px 18px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  outline: none;
+  transition: 0.3s;
+}
+
+.input-style:focus {
+  border-color: #f97316;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+}
+
+/* button */
+.primary-btn {
+  background: #f97316;
+  color: white;
+  padding: 14px 60px;
+  border-radius: 10px;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.primary-btn:hover {
+  background: #ea580c;
+  transform: translateY(-2px);
+}
+
+
