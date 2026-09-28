@@ -24,6 +24,7 @@ import CategorySlider from "@/components/CategorySlider";
 import { countProductVariantsInPayload } from "@/lib/productVariants";
 import { getProductCategoryLabel } from "@/lib/productCategory";
 import { getProductDisplayPricing } from "@/lib/productPricing";
+import { getUserToken } from "@/lib/authSession";
 
 const wheel = "/assets/products/sound-fire.jpeg";
 const ads1 = "/assets/home/ads-1.jpg";
@@ -120,7 +121,7 @@ const resolveProductImage = (item) => {
   return `${BASE_URL}/uploads/${withoutLeadingSlash}`;
 };
 
-const Home = () => {
+const Home = ({ initialBanners = null }) => {
   const [brands, setBrands] = useState([]);
   const [popularProducts, setPopularProducts] = useState([]);
   const [mostSellingProducts, setMostSellingProducts] = useState([]);
@@ -183,7 +184,7 @@ const Home = () => {
 
   useEffect(() => {
     const loadWishlist = async () => {
-      const token = localStorage.getItem("token");
+      const token = getUserToken();
 
       try {
         if (token) {
@@ -204,7 +205,7 @@ const Home = () => {
   }, []);
 
   const toggleWishlist = async (productId) => {
-    const token = localStorage.getItem("token");
+    const token = getUserToken();
 
     try {
       // 🔥 Already in wishlist
@@ -280,7 +281,7 @@ const Home = () => {
   return (
     <>
       {/* slider */}
-      <HeroCarousel />
+      <HeroCarousel initialBanners={initialBanners} />
 
       <h1 className="text-center text-2xl sm:text-3xl font-bold text-gray-900 mt-6 mb-2 px-4">
         Buy Car Accessories Online in India
@@ -562,7 +563,8 @@ const Home = () => {
                             alt={item?.name || "Product"}
                             className="h-36 mx-auto object-contain transition duration-300 group-hover:opacity-30"
                             onError={(e) => {
-                              e.target.src = "/no-image.png";
+                              // Fallback once — never loop if the placeholder itself fails.
+                              if (!e.target.src.endsWith("/no-image.png")) e.target.src = "/no-image.png";
                             }}
                           />
 

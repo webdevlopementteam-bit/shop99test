@@ -1,5 +1,6 @@
 import ProductPage from "@/components/ProductPage";
 import { getProductByIdApi } from "@/lib/api";
+import { SITE_URL, findSeoEntry, applySeoEntry } from "@/lib/seo";
 
 function stripHtml(html) {
   return String(html ?? "")
@@ -32,12 +33,40 @@ export async function generateMetadata({ params }) {
   const fallback = String(product.meta_description || stripHtml(summaryDescription) || product.name || "").trim();
   const description = fallback.length > 160 ? `${fallback.slice(0, 157).trim()}...` : fallback;
 
-  return {
-    title,
-    description,
-    alternates: {
-      canonical: `https://www.shop99.co.in/productPage/${slug}`,
+  // Always the slug URL — even when the page was opened by numeric id
+  // (/productPage/541), which the backend still accepts for old links.
+  const canonical = `${SITE_URL}/productPage/${product.slug || slug}`;
+  const image = product.image
+    ? /^https?:\/\//i.test(product.image)
+      ? product.image
+      : `${SITE_URL}/uploads/${String(product.image).replace(/^\/+/, "")}`
+    : null;
+
+  // Admin SEO entries for a product are keyed by its URL (page_name =
+  // "https://www.shop99.co.in/productPage/<slug-or-id>"), so check both.
+  const seo =
+    (await findSeoEntry(null, `/productPage/${slug}`)) ||
+    (product.id != null && String(product.id) !== String(slug)
+      ? await findSeoEntry(null, `/productPage/${product.id}`)
+      : null);
+
+  const meta = applySeoEntry(
+    {
+      title,
+      description,
+      keywords: String(product.meta_keywords || "").trim() || undefined,
+      alternates: { canonical },
+      openGraph: { title, description, url: canonical, images: image ? [image] : undefined },
     },
+    seo,
+  );
+
+  // Admin SEO may carry an id-based canonical_url (".../productPage/541");
+  // a product's canonical is its slug URL regardless.
+  return {
+    ...meta,
+    alternates: { ...meta.alternates, canonical },
+    openGraph: { ...meta.openGraph, url: canonical },
   };
 }
 

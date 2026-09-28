@@ -1,3 +1,4 @@
+import { pickCategorySeo, saveCategorySeo, getCategorySeoById } from "@/lib/categorySeo.js";
 import "@/lib/models/relations.js";
 import Category from "@/lib/models/categoryModel.js";
 import Product from "@/lib/models/productModel.js";
@@ -24,7 +25,9 @@ export async function GET(request, { params }) {
   try {
     const { id } = await params;
     const data = await Category.findByPk(id);
-    return Response.json(data);
+    if (!data) return Response.json(data);
+    // Plus the SEO fields for the admin edit form ("" until the columns exist).
+    return Response.json({ ...data.get({ plain: true }), ...(await getCategorySeoById(id)) });
   } catch (err) {
     return Response.json(err.message, { status: 500 });
   }
@@ -78,6 +81,7 @@ export async function PUT(request, { params }) {
     );
 
     await syncCategoryHsnToProducts(id, hsn);
+    const seoSaved = await saveCategorySeo(id, pickCategorySeo(body));
 
     if (newParentId) {
       await Category.update({ is_parent: true }, { where: { id: newParentId } });
@@ -90,7 +94,7 @@ export async function PUT(request, { params }) {
       }
     }
 
-    return Response.json({ success: true });
+    return Response.json({ success: true, seoSaved });
   } catch (err) {
     console.log(err);
     return Response.json(err.message, { status: 500 });

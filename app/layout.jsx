@@ -4,10 +4,11 @@ import "./globals.css";
 export const metadata = {
   icons: {
     icon: [
-      { url: "/favicon.ico?v=3" },
-      { url: "/favicon.png", type: "image/png" },
+      { url: "/favicon.ico?v=4" },
+      { url: "/favicon.png?v=4", type: "image/png", sizes: "192x192" },
     ],
-    shortcut: "/favicon.ico?v=3",
+    shortcut: "/favicon.ico?v=4",
+    apple: "/apple-icon.png",
   },
   other: {
     "google-site-verification": "tZIwVfRSlkh_HJclheO4EnblPU19JaN2RkJ_TczwgGA",

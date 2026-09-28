@@ -95,7 +95,8 @@ export default function BlogDetail({ id, initialBlog }) {
           alt={title}
           className="w-full mt-6 rounded-2xl border border-gray-200 max-h-[520px] object-cover"
           onError={(e) => {
-            e.currentTarget.src = "/no-image.png";
+            // Fallback once — never loop if the placeholder itself fails.
+            if (!e.currentTarget.src.endsWith("/no-image.png")) e.currentTarget.src = "/no-image.png";
           }}
         />
 

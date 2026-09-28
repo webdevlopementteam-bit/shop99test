@@ -1,3 +1,4 @@
+import { pickCategorySeo, saveCategorySeo } from "@/lib/categorySeo.js";
 import "@/lib/models/relations.js";
 import Category from "@/lib/models/categoryModel.js";
 import Product from "@/lib/models/productModel.js";
@@ -95,8 +96,9 @@ export async function POST(request) {
     }
 
     await syncCategoryHsnToProducts(newCategory.id, hsn);
+    const seoSaved = await saveCategorySeo(newCategory.id, pickCategorySeo(body));
 
-    return Response.json({ success: true, data: newCategory });
+    return Response.json({ success: true, data: newCategory, seoSaved });
   } catch (err) {
     console.log(err);
     return Response.json({ message: err.message }, { status: 500 });

@@ -1,14 +1,8 @@
 import BlogDetail from "@/components/BlogDetail";
 import { getBlogByIdApi } from "@/lib/api";
+import { SITE_URL, uploadUrl, findSeoEntry, applySeoEntry } from "@/lib/seo";
 
 const toText = (value) => (value == null ? "" : String(value).trim());
-
-const getBlogImage = (image) => {
-  const raw = toText(image);
-  if (!raw) return null;
-  if (/^https?:\/\//i.test(raw)) return raw;
-  return `${process.env.FRONTEND_URL || "https://www.shop99.co.in"}/uploads/${raw.replace(/^\/+/, "")}`;
-};
 
 async function fetchBlog(id) {
   try {
@@ -27,20 +21,25 @@ export async function generateMetadata({ params }) {
   const title = toText(blog.title) || "Untitled Blog";
   const metaTitle = toText(blog.meta_title) || title;
   const metaDescription = toText(blog.meta_description);
-  const image = getBlogImage(blog.image);
-  const canonicalUrl = `https://www.shop99.co.in/blog/${blog.slug || blog.id}`;
+  const image = uploadUrl(blog.image);
+  const canonicalUrl = `${SITE_URL}/blog/${blog.slug || blog.id}`;
+  const seo = await findSeoEntry(null, `/blog/${blog.slug || blog.id}`);
 
-  return {
-    title: metaTitle,
-    description: metaDescription || undefined,
-    keywords: blog.meta_keywords || undefined,
-    alternates: { canonical: canonicalUrl },
-    openGraph: {
+  return applySeoEntry(
+    {
       title: metaTitle,
       description: metaDescription || undefined,
-      images: image ? [image] : undefined,
+      keywords: blog.meta_keywords || undefined,
+      alternates: { canonical: canonicalUrl },
+      openGraph: {
+        title: metaTitle,
+        description: metaDescription || undefined,
+        url: canonicalUrl,
+        images: image ? [image] : undefined,
+      },
     },
-  };
+    seo,
+  );
 }
 
 export default async function Page({ params }) {

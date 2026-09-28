@@ -1,13 +1,18 @@
+import { revalidatePath } from "next/cache";
 import { Op } from "sequelize";
 import SEO from "@/lib/models/seoModel.js";
 import { saveUploadedFile, deleteUploadedFile } from "@/lib/upload.js";
+
+// SEO feeds generateMetadata on statically generated pages — refresh them
+// all so admin changes show up without a redeploy (regenerated on next visit).
+const refreshPages = () => revalidatePath("/", "layout");
 
 /* ================= GET BY PAGE (:id here is actually the page_name, per original :page route) ================= */
 export async function GET(request, { params }) {
   try {
     const { id: page } = await params;
 
-    const seo = await SEO.findOne({ where: { page_name: page, is_active: true } });
+    const seo = await SEO.findOne({ where: { page_name: page, is_active: "active" } });
 
     if (!seo) {
       return Response.json({ message: "SEO not found" }, { status: 404 });
@@ -58,6 +63,7 @@ export async function PUT(request, { params }) {
     }
 
     await seo.update(updatedData);
+    refreshPages();
 
     return Response.json({ success: true, message: "SEO updated successfully", data: seo });
   } catch (error) {
@@ -80,6 +86,7 @@ export async function DELETE(request, { params }) {
     }
 
     await seo.destroy();
+    refreshPages();
 
     return Response.json({ message: "SEO deleted successfully" });
   } catch (error) {

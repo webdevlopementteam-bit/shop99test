@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { getUserToken } from "@/lib/authSession";
 
 /**
  * Only renders children when JWT exists. Used for checkout.
  */
 export default function RequireAuth({ children }) {
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const token = getUserToken();
   if (token) return children;
 
   const redirect = encodeURIComponent("/checkout");

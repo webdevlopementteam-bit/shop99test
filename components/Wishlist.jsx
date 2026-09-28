@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { countProductVariantsInPayload } from "@/lib/productVariants";
 import { getProductDisplayPricing } from "@/lib/productPricing";
+import { getUserToken } from "@/lib/authSession";
 
 export default function Wishlist() {
   const [wishlist, setWishlist] = useState([]);
@@ -14,7 +15,7 @@ export default function Wishlist() {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = getUserToken();
 
     // 🔥 If not logged in → redirect immediately
     if (!token) {

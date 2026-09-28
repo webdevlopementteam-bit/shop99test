@@ -12,8 +12,9 @@ export async function GET(request) {
       attributes: ["id", "name", "phone", "email", "city", "image", "role"],
     });
 
+    // Valid signature but the account is gone — the session is no longer valid.
     if (!dbUser) {
-      return Response.json({ message: "User not found" }, { status: 404 });
+      return Response.json({ message: "Session expired" }, { status: 401 });
     }
 
     return Response.json(dbUser);

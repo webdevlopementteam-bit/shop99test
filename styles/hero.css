@@ -20,6 +20,15 @@
   max-width: 100%;
   height: auto;
 }
+/* First slide on page load: visible straight away, even before Swiper's JS
+   marks it active. Removed (see HeroCarousel `introDone`) once slides change. */
+.hero-intro .hero-slide[data-first] .hero-text,
+.hero-intro .hero-slide[data-first] .hero-product {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
 /* ================= ACTIVE SLIDE ================= */
 
 /* TEXT animation */

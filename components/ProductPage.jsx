@@ -35,6 +35,7 @@ import {
   normalizeVariantSpecifications,
   stripHeadingPseudoRowsFromSpecs,
 } from "@/lib/productVariants";
+import { getUserToken } from "@/lib/authSession";
 
 /** Read-only chips (non-selected table rows). */
 function AttributeValueChips({ value }) {
@@ -221,34 +222,6 @@ function pickUserIdentityForOrders(profile, fallbackUser) {
   };
 }
 
-function orderBelongsToUserForReview(order, userIdentity) {
-  if (!order || typeof order !== "object") return false;
-  const uid = userIdentity?.id;
-  if (uid != null) {
-    const orderIds = [
-      order.user_id,
-      order.userId,
-      order.UserId,
-      order.customer_id,
-      order.customerId,
-      order.CustomerId,
-    ].filter((x) => x != null);
-    if (orderIds.some((x) => String(x) === String(uid))) return true;
-  }
-
-  const targetName = normalizeIdentityStr(userIdentity?.name);
-  const targetPhone = normalizeIdentityStr(userIdentity?.phone);
-  const targetEmail = normalizeIdentityStr(userIdentity?.email);
-  const orderName = normalizeIdentityStr(order.customer_name ?? order.name);
-  const orderPhone = normalizeIdentityStr(order.phone ?? order.customer_phone ?? order.mobile);
-  const orderEmail = normalizeIdentityStr(order.email ?? order.customer_email);
-
-  if (targetEmail && orderEmail && targetEmail === orderEmail) return true;
-  if (targetPhone && orderPhone && targetPhone === orderPhone) return true;
-  if (targetName && orderName && targetName === orderName) return true;
-  return false;
-}
-
 function orderRowProductId(order) {
   if (!order || typeof order !== "object") return null;
   const raw =
@@ -295,7 +268,6 @@ function userHasPurchasedProduct(orders, productId, userIdentity) {
   if (!Number.isFinite(pid)) return false;
   const list = Array.isArray(orders) ? orders : [];
   for (const order of list) {
-    if (!orderBelongsToUserForReview(order, userIdentity)) continue;
     if (!orderCountsAsPurchaseForReview(order)) continue;
     for (const line of orderLinesForPurchaseCheck(order)) {
       const linePid = orderRowProductId(line);
@@ -525,7 +497,7 @@ export default function ProductPage({ slug, initialProduct }) {
       setPurchaseCheckLoading(false);
       return;
     }
-    const token = localStorage.getItem("token");
+    const token = getUserToken();
     if (!token) {
       setHasPurchasedProduct(false);
       setPurchaseCheckLoading(false);
@@ -986,21 +958,6 @@ export default function ProductPage({ slug, initialProduct }) {
     return (product.short_description || product.description || "").trim();
   }, [normalizedVariants, matchedVariant, product]);
 
-  /** meta_title/meta_description are backend-generated fallbacks already (name /
-   * first ~160 chars of description) — these are just a last line of defense. */
-  const pdpMetaTitle = useMemo(() => {
-    if (!product) return "SHOP99";
-    return String(product.meta_title || product.name || "SHOP99").trim();
-  }, [product]);
-
-  const pdpMetaDescription = useMemo(() => {
-    if (!product) return "";
-    const fallback = String(
-      product.meta_description || stripHtml(summaryDescription) || product.name || "",
-    ).trim();
-    return fallback.length > 160 ? `${fallback.slice(0, 157).trim()}...` : fallback;
-  }, [product, summaryDescription]);
-
   /** short_description is rich HTML from the admin's Jodit editor — sanitize
    * before dangerouslySetInnerHTML. Skipped during SSR (no DOM there); the
    * backend already sanitizes on save, so the raw value is safe either way. */
@@ -1189,10 +1146,6 @@ export default function ProductPage({ slug, initialProduct }) {
 
   return (
     <>
-      <title>{pdpMetaTitle}</title>
-      <meta name="description" content={pdpMetaDescription} />
-      <link rel="canonical" href={`https://www.shop99.co.in/productPage/${slug}`} />
-
       <div className="min-h-screen w-full overflow-x-hidden bg-gray-100">
       <div className="h-2 bg-orange-500 sm:h-3" />
 

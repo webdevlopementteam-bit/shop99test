@@ -282,9 +282,12 @@ export default function Inventory() {
                           <img
                             src={r.productImage}
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="h-12 w-12 rounded-lg bg-white p-1 object-contain"
                             onError={(e) => {
-                              e.currentTarget.src = "/no-image.png";
+                              // Fallback once — never loop if the placeholder itself fails.
+                              if (!e.currentTarget.src.endsWith("/no-image.png")) e.currentTarget.src = "/no-image.png";
                             }}
                           />
                           <div className="min-w-0">

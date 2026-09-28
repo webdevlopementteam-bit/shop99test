@@ -66,7 +66,8 @@ const PopularProductsSlider = ({ popularProducts, toggleWishlist, wishlistIds, h
                   alt={item?.name || "Product"}
                   className="h-44 mx-auto object-contain transition duration-300 group-hover:opacity-30"
                   onError={(e) => {
-                    e.target.src = "/no-image.png";
+                    // Fallback once — never loop if the placeholder itself fails.
+                    if (!e.target.src.endsWith("/no-image.png")) e.target.src = "/no-image.png";
                   }}
                 />
 

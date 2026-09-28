@@ -16,6 +16,7 @@ import {
   extractPdpHeroTitleFromVariant,
 } from "@/lib/productVariants";
 import { toast } from "react-toastify";
+import { getUserToken, clearUserSession, USER_SESSION_EXPIRED_EVENT } from "@/lib/authSession";
 
 const logo = "/assets/home/logo.jpg";
 
@@ -1210,7 +1211,7 @@ const Header = () => {
 
         setCategories(buildCategoryTree(all));
 
-        const token = localStorage.getItem("token");
+        const token = getUserToken();
 
         if (token) {
           const data = await getWishlistApi();
@@ -1230,12 +1231,20 @@ const Header = () => {
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = getUserToken();
     const storedUser = localStorage.getItem("user");
 
     if (token) {
       setUser(storedUser ? JSON.parse(storedUser) : { name: "User" });
     }
+
+    // Server rejected the session (see lib/authSession) — show logged-out state.
+    const onExpired = () => {
+      setUser(null);
+      setWishlistCount(JSON.parse(localStorage.getItem("guestWishlist") || "[]").length);
+    };
+    window.addEventListener(USER_SESSION_EXPIRED_EVENT, onExpired);
+    return () => window.removeEventListener(USER_SESSION_EXPIRED_EVENT, onExpired);
   }, []);
 
   useEffect(() => {
@@ -1266,8 +1275,7 @@ const Header = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    clearUserSession();
     toast.success("Logout");
     setUser(null);
     closeAllDropdowns();
@@ -1371,7 +1379,8 @@ const Header = () => {
               alt=""
               className="h-10 w-10 shrink-0 object-contain"
               onError={(e) => {
-                e.target.src = "/no-image.png";
+                // Fallback once — never loop if the placeholder itself fails.
+                if (!e.target.src.endsWith("/no-image.png")) e.target.src = "/no-image.png";
               }}
             />
 

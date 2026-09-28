@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BASE_URL } from "@/lib/adminApi";
+import { BASE_URL, getStoredAuthToken } from "@/lib/adminApi";
 import ProductDropdown from "@/components/admin/ProductDropdown";
 import CategoryDropdown from "@/components/admin/CategoryDropdown";
 
@@ -13,7 +13,7 @@ export default function Coupons() {
   const [categories, setCategories] = useState([]);
 
   const [editingId, setEditingId] = useState(null);
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const token = getStoredAuthToken();
 
   const [form, setForm] = useState({
     code: "",

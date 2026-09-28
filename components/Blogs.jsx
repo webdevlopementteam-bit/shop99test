@@ -89,7 +89,8 @@ export default function Blogs() {
                 alt={toText(blog.title) || "Blog image"}
                 className="w-full h-52 object-cover"
                 onError={(e) => {
-                  e.currentTarget.src = "/no-image.png";
+                  // Fallback once — never loop if the placeholder itself fails.
+                  if (!e.currentTarget.src.endsWith("/no-image.png")) e.currentTarget.src = "/no-image.png";
                 }}
               />
 

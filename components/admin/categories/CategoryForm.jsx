@@ -72,6 +72,9 @@ export default function CategoryForm() {
     hsn: "",
     is_publish: false,
     is_top_category: false,
+    meta_title: "",
+    meta_description: "",
+    meta_keywords: "",
     image: null,
     banner: null
   });
@@ -112,6 +115,9 @@ export default function CategoryForm() {
             hsn: data.hsn != null ? String(data.hsn) : "",
             is_publish: !!data.is_publish,
             is_top_category: !!data.is_top_category,
+            meta_title: data.meta_title || "",
+            meta_description: data.meta_description || "",
+            meta_keywords: data.meta_keywords || "",
             image: null,
             banner: null
           });
@@ -168,6 +174,10 @@ export default function CategoryForm() {
       fd.append("is_publish", form.is_publish ? 1 : 0);
       fd.append("is_top_category", form.is_top_category ? 1 : 0);
 
+      fd.append("meta_title", form.meta_title.trim());
+      fd.append("meta_description", form.meta_description.trim());
+      fd.append("meta_keywords", form.meta_keywords.trim());
+
       if (form.image) {
         fd.append("image", form.image);
       }
@@ -179,10 +189,15 @@ export default function CategoryForm() {
         fd.append("remove_banner", removeBanner ? 1 : 0);
       }
 
-      if (id)
-        await updateCategoryApi(id, fd);
-      else
-        await createCategoryApi(fd);
+      const res = id
+        ? await updateCategoryApi(id, fd)
+        : await createCategoryApi(fd);
+
+      // SEO needs the DB columns from scripts/add-category-seo-columns.mjs.
+      const seoEntered = form.meta_title.trim() || form.meta_description.trim() || form.meta_keywords.trim();
+      if (res?.seoSaved === false && seoEntered) {
+        alert("Category saved, but SEO fields were not saved: the database is missing the SEO columns.");
+      }
 
       router.push("/admin/categories");
 
@@ -297,6 +312,55 @@ export default function CategoryForm() {
                 </p>
               </div>
 
+            </div>
+          </div>
+
+          {/* SEO — used on this category's shop page (/shop?category=<name>) */}
+          <div className="bg-[#111827] p-6 rounded-xl">
+            <h3 className="mb-1 font-semibold">SEO</h3>
+            <p className="mb-4 text-xs text-gray-500">
+              Shown on this category&apos;s shop page. Leave blank to use the defaults.
+            </p>
+
+            <div className="space-y-4">
+              <div>
+                <div className="flex justify-between">
+                  <label className="text-sm text-gray-400">Meta Title</label>
+                  <span className="text-xs text-gray-500">{form.meta_title.length}/60</span>
+                </div>
+                <input
+                  name="meta_title"
+                  value={form.meta_title}
+                  onChange={handleChange}
+                  maxLength={255}
+                  className="mt-1 w-full bg-[#0B0F19] border border-gray-700 p-2 rounded"
+                />
+              </div>
+
+              <div>
+                <div className="flex justify-between">
+                  <label className="text-sm text-gray-400">Meta Description</label>
+                  <span className="text-xs text-gray-500">{form.meta_description.length}/160</span>
+                </div>
+                <textarea
+                  name="meta_description"
+                  value={form.meta_description}
+                  onChange={handleChange}
+                  rows={3}
+                  className="mt-1 w-full bg-[#0B0F19] border border-gray-700 p-2 rounded"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm text-gray-400">Meta Keywords</label>
+                <input
+                  name="meta_keywords"
+                  value={form.meta_keywords}
+                  onChange={handleChange}
+                  placeholder="comma separated, e.g. car charger, fast charger"
+                  className="mt-1 w-full bg-[#0B0F19] border border-gray-700 p-2 rounded"
+                />
+              </div>
             </div>
           </div>
 

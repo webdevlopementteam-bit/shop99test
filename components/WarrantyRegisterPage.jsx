@@ -4,11 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import { getProfileApi, getOrdersApi, createWarrantyApi } from "@/lib/api";
-
-const normalize = (v) =>
-  String(v ?? "")
-    .trim()
-    .toLowerCase();
+import { getUserToken } from "@/lib/authSession";
 
 const pickUserIdentity = (profile, fallbackUser) => {
   const p = profile && typeof profile === "object" ? profile : {};
@@ -19,29 +15,6 @@ const pickUserIdentity = (profile, fallbackUser) => {
     phone: p.phone ?? p.mobile ?? p.contact ?? f.phone ?? f.mobile ?? "",
     email: p.email ?? f.email ?? "",
   };
-};
-
-const orderBelongsToUser = (order, userIdentity) => {
-  if (!order || typeof order !== "object") return false;
-  const uid = userIdentity?.id;
-  if (uid != null) {
-    const orderIds = [order.user_id, order.userId, order.UserId, order.customer_id, order.customerId, order.CustomerId].filter(
-      (x) => x != null,
-    );
-    if (orderIds.some((x) => String(x) === String(uid))) return true;
-  }
-
-  const targetName = normalize(userIdentity?.name);
-  const targetPhone = normalize(userIdentity?.phone);
-  const targetEmail = normalize(userIdentity?.email);
-  const orderName = normalize(order.customer_name ?? order.name);
-  const orderPhone = normalize(order.phone ?? order.customer_phone ?? order.mobile);
-  const orderEmail = normalize(order.email ?? order.customer_email);
-
-  if (targetEmail && orderEmail && targetEmail === orderEmail) return true;
-  if (targetPhone && orderPhone && targetPhone === orderPhone) return true;
-  if (targetName && orderName && targetName === orderName) return true;
-  return false;
 };
 
 export default function WarrantyRegisterPage() {
@@ -60,7 +33,7 @@ export default function WarrantyRegisterPage() {
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = getUserToken();
     if (!token) return;
 
     setIsLoggedIn(true);
@@ -72,8 +45,7 @@ export default function WarrantyRegisterPage() {
         const fallbackUser = JSON.parse(localStorage.getItem("user") || "null");
         const currentUser = pickUserIdentity(profileRes, fallbackUser);
         const safeList = Array.isArray(list) ? list : [];
-        const mine = safeList.filter((o) => orderBelongsToUser(o, currentUser));
-        setOrders(mine);
+        setOrders(safeList); // already scoped to this user by the server
 
         setForm((prev) => ({
           ...prev,

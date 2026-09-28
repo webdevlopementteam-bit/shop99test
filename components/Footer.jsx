@@ -10,6 +10,7 @@ import {
   IMAGE_URL,
 } from "@/lib/api";
 import { toast } from "react-toastify";
+import { getUserToken } from "@/lib/authSession";
 
 export default function Footer() {
   const [footer, setFooter] = useState(null);
@@ -96,7 +97,7 @@ export default function Footer() {
 
     try {
       setSubmittingEmail(true);
-      const token = localStorage.getItem("token");
+      const token = getUserToken();
       let subscriberName = "";
       const localUserRaw = localStorage.getItem("user");
       let localUser = null;

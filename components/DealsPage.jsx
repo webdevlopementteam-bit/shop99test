@@ -9,6 +9,7 @@ import { Home, Sparkles } from "lucide-react";
 import { countProductVariantsInPayload } from "@/lib/productVariants";
 import { getProductDisplayPricing } from "@/lib/productPricing";
 import { setNavState } from "@/lib/navState";
+import { getUserToken } from "@/lib/authSession";
 
 const dealsBanner = "/assets/banner/banner-3.png";
 
@@ -55,7 +56,7 @@ export default function DealsPage({
     if (useParentWishlist) return;
 
     const loadWishlist = async () => {
-      const token = localStorage.getItem("token");
+      const token = getUserToken();
       try {
         if (token) {
           const data = await getWishlistApi();
@@ -75,7 +76,7 @@ export default function DealsPage({
 
   const toggleWishlistLocal = useCallback(
     async (productId) => {
-      const token = localStorage.getItem("token");
+      const token = getUserToken();
 
       try {
         if (localWishlistIds.includes(productId)) {

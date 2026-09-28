@@ -206,7 +206,7 @@ export default function Sidebar() {
           {/* REPORTS */}
           <MenuSection icon={BarChart3} title="Reports">
             <SidebarLink to="/admin/inventory" label="Inventory Ledger" closeSidebar={() => setIsOpen(false)} />
-            <SidebarLink to="/admin/payments" label="Payments" closeSidebar={() => setIsOpen(false)} />
+            <SidebarLink to="/admin" label="Payments" closeSidebar={() => setIsOpen(false)} />
           </MenuSection>
 
           {/* CONTENT */}

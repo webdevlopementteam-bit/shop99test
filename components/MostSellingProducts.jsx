@@ -9,6 +9,7 @@ import { useCart } from "@/context/CartContext";
 import { countProductVariantsInPayload } from "@/lib/productVariants";
 import { getProductCategoryLabel } from "@/lib/productCategory";
 import { getProductDisplayPricing } from "@/lib/productPricing";
+import { getUserToken } from "@/lib/authSession";
 
 const PER_PAGE = 20;
 
@@ -45,7 +46,7 @@ export default function MostSellingProducts() {
 
   useEffect(() => {
     const loadWishlist = async () => {
-      const token = localStorage.getItem("token");
+      const token = getUserToken();
       if (!token) {
         const guestWishlist = JSON.parse(localStorage.getItem("guestWishlist") || "[]");
         setWishlistIds(Array.isArray(guestWishlist) ? guestWishlist : []);
@@ -71,7 +72,7 @@ export default function MostSellingProducts() {
   const paginated = products.slice(start, start + PER_PAGE);
 
   const toggleWishlist = async (productId) => {
-    const token = localStorage.getItem("token");
+    const token = getUserToken();
     if (wishlistIds.includes(productId)) {
       toast.info("Already in wishlist ❤️");
       return;

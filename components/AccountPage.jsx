@@ -22,6 +22,7 @@ import {
 } from "@/lib/api";
 import { toast } from "react-toastify";
 import { INDIAN_STATES } from "@/lib/constants/indianStates";
+import { getUserToken } from "@/lib/authSession";
 
 const profileImage = "/assets/profileIcon.png";
 
@@ -48,9 +49,9 @@ export default function AccountPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = getUserToken();
     if (!token) {
-      window.location.href = "/login";
+      window.location.href = "/login?redirect=%2Faccount";
     }
   }, []);
 
@@ -64,70 +65,15 @@ export default function AccountPage() {
     setActiveTab(t);
   }, [searchParams]);
 
-  const normalize = (v) =>
-    String(v ?? "")
-      .trim()
-      .toLowerCase();
-
-  const pickUserIdentity = (profile, fallbackUser) => {
-    const p = profile && typeof profile === "object" ? profile : {};
-    const f =
-      fallbackUser && typeof fallbackUser === "object" ? fallbackUser : {};
-    return {
-      id: p.id ?? p.user_id ?? p.userId ?? f.id ?? f.user_id ?? f.userId,
-      name: p.name ?? p.customer_name ?? f.name ?? f.customer_name ?? "",
-      phone: p.phone ?? p.mobile ?? p.contact ?? f.phone ?? f.mobile ?? "",
-      email: p.email ?? f.email ?? "",
-    };
-  };
-
-  const orderBelongsToUser = (order, userIdentity) => {
-    if (!order || typeof order !== "object") return false;
-    const uid = userIdentity?.id;
-    if (uid != null) {
-      const orderIds = [
-        order.user_id,
-        order.userId,
-        order.UserId,
-        order.customer_id,
-        order.customerId,
-        order.CustomerId,
-      ].filter((x) => x != null);
-      if (orderIds.some((x) => String(x) === String(uid))) return true;
-    }
-
-    const targetName = normalize(userIdentity?.name);
-    const targetPhone = normalize(userIdentity?.phone);
-    const targetEmail = normalize(userIdentity?.email);
-    const orderName = normalize(order.customer_name ?? order.name);
-    const orderPhone = normalize(
-      order.phone ?? order.customer_phone ?? order.mobile,
-    );
-    const orderEmail = normalize(order.email ?? order.customer_email);
-
-    if (targetEmail && orderEmail && targetEmail === orderEmail) return true;
-    if (targetPhone && orderPhone && targetPhone === orderPhone) return true;
-    if (targetName && orderName && targetName === orderName) return true;
-    return false;
-  };
-
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const [ordersRes, profileRes] = await Promise.all([
-        getOrdersApi(),
-        getProfileApi().catch(() => null),
-      ]);
+      // Server already returns only this user's orders.
+      const ordersRes = await getOrdersApi();
       const list = Array.isArray(ordersRes)
         ? ordersRes
         : (ordersRes?.data ?? ordersRes?.orders ?? []);
-      const fallbackUser = JSON.parse(localStorage.getItem("user") || "null");
-      const currentUser = pickUserIdentity(profileRes, fallbackUser);
-      const safeList = Array.isArray(list) ? list : [];
-      const onlyMyOrders = safeList.filter((o) =>
-        orderBelongsToUser(o, currentUser),
-      );
-      setOrders(onlyMyOrders);
+      setOrders(Array.isArray(list) ? list : []);
     } catch {
       setOrders([]);
     }
@@ -1489,7 +1435,8 @@ function WishlistSection({ wishlist, loading }) {
                   alt=""
                   onError={(e) => {
                     e.currentTarget.onerror = null;
-                    e.currentTarget.src = "/no-image.png";
+                    // Fallback once — never loop if the placeholder itself fails.
+                    if (!e.currentTarget.src.endsWith("/no-image.png")) e.currentTarget.src = "/no-image.png";
                   }}
                 />
                 <p className="min-w-0 break-words">{name}</p>

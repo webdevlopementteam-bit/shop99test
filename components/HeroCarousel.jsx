@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination, EffectFade } from "swiper/modules";
-import { getBannersApi, BASE_URL } from "@/lib/api";
+import { getBannersApi } from "@/lib/api";
 
 import "swiper/css";
 import "swiper/css/effect-fade";
@@ -13,15 +13,20 @@ import "@/styles/hero.css";
 
 import { useRouter } from "next/navigation";
 
-const HeroCarousel = () => {
+const HeroCarousel = ({ initialBanners = null }) => {
   const router = useRouter();
-  const [banners, setBanners] = useState([]);
+  // Server-rendered banners (app/(storefront)/page.jsx) so the hero is in the
+  // first HTML; the client fetch below is only a fallback.
+  const [banners, setBanners] = useState(initialBanners ?? []);
+  // The first slide shows immediately — its entrance animation (up to ~2s of
+  // delay in hero.css) only plays once the carousel starts moving.
+  const [introDone, setIntroDone] = useState(false);
 
   useEffect(() => {
+    if (initialBanners) return;
     const fetchBanners = async () => {
       try {
         const data = await getBannersApi();
-        console.log("Banners:", data);
 
         setBanners(data);
 
@@ -35,10 +40,10 @@ const HeroCarousel = () => {
     };
 
     fetchBanners();
-  }, []);
+  }, [initialBanners]);
 
   return (
-    <div className="relative ">
+    <div className={`relative ${introDone ? "" : "hero-intro"}`}>
       <Swiper
         key={banners.length}
         modules={[Autoplay, Pagination, EffectFade]}
@@ -50,13 +55,19 @@ const HeroCarousel = () => {
         loop
         observer={true}
         observeParents={true}
+        // realIndex, not activeIndex: loop mode can shift activeIndex during init.
+        onSlideChange={(swiper) => {
+          if (swiper.realIndex !== 0) setIntroDone(true);
+        }}
       >
         {banners.map((banner, i) => {
-          const bg = banner?.background ? `${BASE_URL}/uploads/${banner.background}` : "";
+          // Relative on purpose: BASE_URL is http://localhost:3000 during server render.
+          const bg = banner?.background ? `/uploads/${banner.background}` : "";
 
           return (
             <SwiperSlide key={banner.id}>
               <div
+                data-first={i === 0 ? "" : undefined}
                 className="hero-slide min-h-[420px] sm:min-h-[480px] md:h-[550px] lg:h-[600px] bg-cover bg-center flex items-center px-4 sm:px-8 lg:px-24 relative z-0 overflow-visible"
                 style={{
                   backgroundImage: `url(${bg})`,
@@ -113,9 +124,11 @@ const HeroCarousel = () => {
               "
                 >
                   <img
-                    src={`${BASE_URL}/uploads/${banner.image}`}
+                    src={`/uploads/${banner.image}`}
                     alt={banner.title}
-                    loading="lazy"
+                    // First slide is above the fold (and preloaded) — load it now.
+                    loading={i === 0 ? "eager" : "lazy"}
+                    fetchPriority={i === 0 ? "high" : "auto"}
                     className="max-h-[90%] w-auto object-contain"
                   />
                 </div>

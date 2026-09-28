@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import "@/lib/models/relations.js";
 import Banner from "@/lib/models/bannerModel.js";
 import Product from "@/lib/models/productModel.js";
@@ -33,6 +34,8 @@ export async function POST(request) {
       background,
       product_id: product_id || null,
     });
+    // Homepage hero is rendered from banners at build/revalidate time.
+    revalidatePath("/");
 
     return Response.json({ message: "Banner Created" });
   } catch (error) {

@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import Banner from "@/lib/models/bannerModel.js";
 import { saveUploadedFile } from "@/lib/upload.js";
 
@@ -18,6 +19,8 @@ export async function PUT(request, { params }) {
       { title, subtitle, image, background, product_id: product_id || null },
       { where: { id } },
     );
+    // Homepage hero is rendered from banners at build/revalidate time.
+    revalidatePath("/");
 
     return Response.json({ message: "Banner Updated" });
   } catch (error) {
@@ -34,6 +37,8 @@ export async function DELETE(request, { params }) {
     if (!banner) return Response.json({ error: "Banner not found" }, { status: 404 });
 
     await banner.destroy();
+    // Homepage hero is rendered from banners at build/revalidate time.
+    revalidatePath("/");
 
     return Response.json({ message: "Banner Deleted" });
   } catch (error) {

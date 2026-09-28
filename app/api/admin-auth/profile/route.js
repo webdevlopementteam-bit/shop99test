@@ -11,8 +11,9 @@ export async function GET(request) {
       attributes: ["id", "name", "phone", "role", "can_delete_users"],
     });
 
+    // Valid signature but the admin account is gone — the session is no longer valid.
     if (!admin) {
-      return Response.json({ message: "Admin not found" }, { status: 404 });
+      return Response.json({ message: "Session expired" }, { status: 401 });
     }
 
     return Response.json(admin);

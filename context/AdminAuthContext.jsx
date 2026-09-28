@@ -52,12 +52,10 @@ export function AdminAuthProvider({ children }) {
         phone: n.phone,
         role: n.role || "Administrator",
       });
-    } catch (e) {
-      const status = e?.response?.status;
-      if (status === 401) {
-        clearStoredAuthTokens();
-        setProfile({ name: "", phone: "", role: "" });
-      }
+    } catch {
+      // A rejected session (401 / non-admin 403) is ended and redirected by
+      // the adminApi response interceptor; anything else (network, 5xx) keeps
+      // the session — it's still valid, the profile just didn't load.
     } finally {
       setLoading(false);
     }

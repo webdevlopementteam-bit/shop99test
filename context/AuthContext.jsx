@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
+import { clearUserSession, USER_SESSION_EXPIRED_EVENT } from "@/lib/authSession";
 
 const AuthContext = createContext();
 
@@ -18,6 +19,10 @@ export const AuthProvider = ({ children }) => {
     if (!userToken && legacyToken && storedUser) {
       localStorage.setItem("userToken", legacyToken);
     }
+
+    const onExpired = () => setUser(null);
+    window.addEventListener(USER_SESSION_EXPIRED_EVENT, onExpired);
+    return () => window.removeEventListener(USER_SESSION_EXPIRED_EVENT, onExpired);
   }, []);
 
   const login = (userData, token) => {
@@ -28,9 +33,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem("userToken");
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    clearUserSession();
     setUser(null);
   };
 

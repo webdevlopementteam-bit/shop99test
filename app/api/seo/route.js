@@ -1,5 +1,10 @@
+import { revalidatePath } from "next/cache";
 import SEO from "@/lib/models/seoModel.js";
 import { saveUploadedFile } from "@/lib/upload.js";
+
+// SEO feeds generateMetadata on statically generated pages — refresh them
+// all so admin changes show up without a redeploy (regenerated on next visit).
+const refreshPages = () => revalidatePath("/", "layout");
 
 /* ================= GET ALL SEO ================= */
 export async function GET() {
@@ -32,6 +37,7 @@ export async function POST(request) {
     const og_image = await saveUploadedFile(formData.get("og_image"));
 
     const data = await SEO.create({ ...body, is_active, og_image });
+    refreshPages();
 
     return Response.json(
       { success: true, message: "SEO created successfully", data },

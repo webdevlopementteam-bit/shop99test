@@ -9,6 +9,20 @@ import { toast } from "react-toastify";
 import { useSearchParams, useRouter } from "next/navigation";
 import Pagination from "@/components/Pagination";
 import { countProductVariantsInPayload } from "@/lib/productVariants";
+import { getUserToken } from "@/lib/authSession";
+
+function readGuestWishlist() {
+  try {
+    const list = JSON.parse(localStorage.getItem("guestWishlist") || "[]");
+    return Array.isArray(list) ? list : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeGuestWishlist(ids) {
+  localStorage.setItem("guestWishlist", JSON.stringify([...new Set(ids)]));
+}
 
 export default function ShopPage() {
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -138,11 +152,14 @@ export default function ShopPage() {
   useEffect(() => {
     const loadWishlist = async () => {
       try {
-        const res = await getWishlistApi();
-
-        const ids = res.data.map((item) => item.product_id);
-
-        setWishlistIds(ids);
+        if (getUserToken()) {
+          // GET /wishlist returns the Wishlist rows as a plain array.
+          const data = await getWishlistApi();
+          setWishlistIds(Array.isArray(data) ? data.map((item) => item.ProductId) : []);
+        } else {
+          // Logged out: guest wishlist lives in localStorage (same as Home).
+          setWishlistIds(readGuestWishlist());
+        }
       } catch (err) {
         console.log("Wishlist load error", err);
       }
@@ -169,15 +186,19 @@ export default function ShopPage() {
   }, [brandParam, brands]);
 
   const toggleWishlist = async (id) => {
+    const loggedIn = !!getUserToken();
     try {
       if (wishlistIds.includes(id)) {
-        await removeWishlistApi(id);
+        if (loggedIn) await removeWishlistApi(id);
+        else writeGuestWishlist(readGuestWishlist().filter((w) => w !== id));
 
         setWishlistIds(wishlistIds.filter((w) => w !== id));
 
         toast.success("Removed from wishlist");
       } else {
-        await addToWishlistApi(id);
+        // POST /wishlist expects { productId }.
+        if (loggedIn) await addToWishlistApi({ productId: id });
+        else writeGuestWishlist([...readGuestWishlist(), id]);
 
         setWishlistIds([...wishlistIds, id]);
 

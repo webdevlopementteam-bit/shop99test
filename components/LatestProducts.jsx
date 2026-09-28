@@ -196,7 +196,8 @@ export default function LatestProducts({ products: productsFromParent, setPrevie
                   alt={item.name}
                   className="h-32 sm:h-28 w-full object-contain transition-all duration-500 group-hover:opacity-30"
                   onError={(e) => {
-                    e.currentTarget.src = "/no-image.png";
+                    // Fallback once — never loop if the placeholder itself fails.
+                    if (!e.currentTarget.src.endsWith("/no-image.png")) e.currentTarget.src = "/no-image.png";
                   }}
                 />
 
