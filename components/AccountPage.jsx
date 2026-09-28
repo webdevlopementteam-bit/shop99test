@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -1122,7 +1122,7 @@ function OrdersSection({ orders, loading, onOrderActionSuccess }) {
           const tlink = item.tracking_link;
 
           return (
-            <React.Fragment key={item.id}>
+            <Fragment key={item.id}>
               <div className="flex flex-col gap-4 rounded-xl border p-3 sm:p-4 md:flex-row md:items-start md:justify-between">
                 <div className="flex min-w-0 gap-3">
                   <div className="min-w-0 flex-1">
@@ -1396,7 +1396,7 @@ function OrdersSection({ orders, loading, onOrderActionSuccess }) {
                   </div>
                 </div>
               )}
-            </React.Fragment>
+            </Fragment>
           );
         })}
       </div>
