@@ -8,20 +8,20 @@ export default function ProductList() {
   const router = useRouter();
   const [products, setProducts] = useState([]);
 
-  const load = async () => {
-    const data = await getProductsApi();
-    setProducts(data);
+  // getProductsApi returns a page ({ data, totalPages }), not a bare array.
+  const fetchProducts = async () => {
+    const res = await getProductsApi();
+    return Array.isArray(res) ? res : Array.isArray(res?.data) ? res.data : [];
   };
 
+  const load = async () => setProducts(await fetchProducts());
+
   useEffect(() => {
-     const load = async () => {
-    const data = await getProductsApi();
-    setProducts(data);
-  };
-    load();
+    fetchProducts().then(setProducts);
   }, []);
 
   const remove = async (id) => {
+    if (!window.confirm("Delete this product? This cannot be undone.")) return;
     await deleteProductApi(id);
     load();
   };
@@ -63,6 +63,7 @@ export default function ProductList() {
                 <td className="p-3">
                     <img
                       src={`${BASE_URL}/uploads/${p.image}`}
+                      alt=""
                       className="w-12 h-12 object-contain"
                     />
                 </td>

@@ -2,6 +2,8 @@ import fs from "fs";
 import Order from "@/lib/models/orderModel.js";
 import { createInvoicePDF } from "@/lib/services/pdfService.js";
 import { ensureInvoicePdf } from "@/lib/orderHelpers.js";
+import { requireOrderAccess } from "@/lib/orderAccess.js";
+import { AuthError, authErrorResponse } from "@/lib/auth.js";
 
 /* ================= GENERATE INVOICE ================= */
 export async function POST(request, { params }) {
@@ -12,6 +14,7 @@ export async function POST(request, { params }) {
     if (!orderInstance) {
       return Response.json({ message: "Order not found" }, { status: 404 });
     }
+    await requireOrderAccess(request, orderInstance);
 
     const order = orderInstance.get({ plain: true });
 
@@ -22,6 +25,7 @@ export async function POST(request, { params }) {
 
     return Response.json({ success: true, url, invoice_url: url, data: orderInstance });
   } catch (err) {
+    if (err instanceof AuthError) return authErrorResponse(err);
     console.error("INVOICE ERROR:", err);
     return Response.json({ message: err.message }, { status: 500 });
   }
@@ -36,6 +40,7 @@ export async function GET(request, { params }) {
     if (!orderInstance) {
       return Response.json({ message: "Order not found" }, { status: 404 });
     }
+    await requireOrderAccess(request, orderInstance);
 
     const filePath = await ensureInvoicePdf(orderInstance);
 
@@ -56,6 +61,7 @@ export async function GET(request, { params }) {
       },
     });
   } catch (err) {
+    if (err instanceof AuthError) return authErrorResponse(err);
     console.error("INVOICE ERROR:", err);
     return Response.json({ message: err.message }, { status: 500 });
   }

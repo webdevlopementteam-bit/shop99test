@@ -1,3 +1,4 @@
+import { withAdmin } from "@/lib/auth.js";
 import { Op } from "sequelize";
 import PopularProduct from "@/lib/models/popularProductModel.js";
 import Product from "@/lib/models/productModel.js";
@@ -5,7 +6,7 @@ import Offer from "@/lib/models/offerModel.js";
 import { discountedPriceForOffer, resolveProductOfferByIds } from "@/lib/offerPricing.js";
 
 /* ================= ADD ================= */
-export async function POST(request) {
+async function handlePOST(request) {
   try {
     const { productIds } = await request.json();
 
@@ -90,3 +91,5 @@ export async function GET() {
     return Response.json({ error: error.message }, { status: 500 });
   }
 }
+
+export const POST = withAdmin(handlePOST);

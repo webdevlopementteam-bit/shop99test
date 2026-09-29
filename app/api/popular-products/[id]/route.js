@@ -1,6 +1,7 @@
+import { withAdmin } from "@/lib/auth.js";
 import PopularProduct from "@/lib/models/popularProductModel.js";
 
-export async function DELETE(request, { params }) {
+async function handleDELETE(request, { params }) {
   try {
     const { id } = await params;
     await PopularProduct.destroy({ where: { id } });
@@ -9,3 +10,5 @@ export async function DELETE(request, { params }) {
     return Response.json({ error: error.message }, { status: 500 });
   }
 }
+
+export const DELETE = withAdmin(handleDELETE);

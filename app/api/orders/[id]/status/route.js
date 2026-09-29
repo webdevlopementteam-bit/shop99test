@@ -1,7 +1,8 @@
+import { withAdmin } from "@/lib/auth.js";
 import Order from "@/lib/models/orderModel.js";
 import { notifyOrderStatusChangeAsync } from "@/lib/services/orderStatusSms.js";
 
-export async function PUT(request, { params }) {
+async function handlePUT(request, { params }) {
   try {
     const { id } = await params;
     const body = await request.json();
@@ -53,3 +54,5 @@ export async function PUT(request, { params }) {
     return Response.json({ message: err.message }, { status: 500 });
   }
 }
+
+export const PUT = withAdmin(handlePUT);

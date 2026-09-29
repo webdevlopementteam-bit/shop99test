@@ -1,3 +1,4 @@
+import { withAdmin } from "@/lib/auth.js";
 import "@/lib/models/relations.js";
 import ProductReview from "@/lib/models/productReviewModel.js";
 import Product from "@/lib/models/productModel.js";
@@ -9,7 +10,7 @@ const reviewIncludeAdmin = [
   { model: Product, attributes: ["id", "name"] },
 ];
 
-export async function PUT(request, { params }) {
+async function handlePUT(request, { params }) {
   try {
     const { id } = await params;
     const formData = await request.formData();
@@ -57,7 +58,7 @@ export async function PUT(request, { params }) {
   }
 }
 
-export async function DELETE(request, { params }) {
+async function handleDELETE(request, { params }) {
   try {
     const { id } = await params;
     const review = await ProductReview.findByPk(id);
@@ -71,3 +72,7 @@ export async function DELETE(request, { params }) {
     return Response.json({ message: error.message || "Error deleting review" }, { status: 500 });
   }
 }
+
+export const PUT = withAdmin(handlePUT);
+
+export const DELETE = withAdmin(handleDELETE);

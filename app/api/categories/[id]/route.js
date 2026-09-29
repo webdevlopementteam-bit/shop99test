@@ -1,3 +1,4 @@
+import { withAdmin } from "@/lib/auth.js";
 import { pickCategorySeo, saveCategorySeo, getCategorySeoById } from "@/lib/categorySeo.js";
 import "@/lib/models/relations.js";
 import Category from "@/lib/models/categoryModel.js";
@@ -34,7 +35,7 @@ export async function GET(request, { params }) {
 }
 
 /* ================= UPDATE ================= */
-export async function PUT(request, { params }) {
+async function handlePUT(request, { params }) {
   try {
     const { id } = await params;
     const formData = await request.formData();
@@ -102,7 +103,7 @@ export async function PUT(request, { params }) {
 }
 
 /* ================= DELETE ================= */
-export async function DELETE(request, { params }) {
+async function handleDELETE(request, { params }) {
   try {
     const { id } = await params;
 
@@ -138,3 +139,7 @@ export async function DELETE(request, { params }) {
     return Response.json(err.message, { status: 500 });
   }
 }
+
+export const PUT = withAdmin(handlePUT);
+
+export const DELETE = withAdmin(handleDELETE);

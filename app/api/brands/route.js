@@ -1,3 +1,4 @@
+import { withAdmin } from "@/lib/auth.js";
 import Brand from "@/lib/models/brandModel.js";
 import { saveUploadedFile } from "@/lib/upload.js";
 
@@ -11,7 +12,7 @@ export async function GET() {
   }
 }
 
-export async function POST(request) {
+async function handlePOST(request) {
   try {
     const formData = await request.formData();
     const name = formData.get("name");
@@ -25,3 +26,5 @@ export async function POST(request) {
     return Response.json({ message: "Brand create failed" }, { status: 500 });
   }
 }
+
+export const POST = withAdmin(handlePOST);

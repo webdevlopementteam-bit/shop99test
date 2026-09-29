@@ -1,12 +1,27 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import Admin from "@/lib/models/adminModel.js";
+import { requireAdmin, AuthError, authErrorResponse } from "@/lib/auth.js";
 
 const generateToken = (id, role) => jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
 /** POST body: name?, phone, password */
 export async function POST(request) {
   try {
+    // Open only for first-time setup (no admin yet). After that, only an
+    // existing admin may create another — otherwise anyone could make
+    // themselves an admin.
+    if ((await Admin.count()) > 0) {
+      try {
+        requireAdmin(request);
+      } catch (err) {
+        if (err instanceof AuthError) {
+          return Response.json({ message: "Admin registration is closed. Ask an existing admin." }, { status: 403 });
+        }
+        throw err;
+      }
+    }
+
     const { name, phone, password } = await request.json();
 
     if (!phone || !password) {

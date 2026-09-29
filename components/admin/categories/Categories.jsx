@@ -1,11 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  getAllCategoriesFlatApi,
-  deleteCategoryApi,
-  BASE_URL,
-} from "@/lib/adminApi";
+import { getAllCategoriesFlatApi, deleteCategoryApi, BASE_URL, adminFetch } from "@/lib/adminApi";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 
@@ -94,7 +90,7 @@ export default function Categories() {
         gst_percentage: gst,
       };
 
-      const res = await fetch(`${BASE_URL}/api/categories/${category.id}`, {
+      const res = await adminFetch(`${BASE_URL}/api/categories/${category.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

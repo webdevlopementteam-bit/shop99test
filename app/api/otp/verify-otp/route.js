@@ -1,6 +1,6 @@
-import jwt from "jsonwebtoken";
 import OTP from "@/lib/models/otpModel.js";
 import User from "@/lib/models/userModel.js";
+import { signUserToken } from "@/lib/auth.js";
 
 export async function POST(request) {
   try {
@@ -38,15 +38,15 @@ export async function POST(request) {
       await user.save();
     }
 
-    const token = jwt.sign({ id: user.id, phone: user.phone }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    // Valid for USER_SESSION_TTL (7 days); the storefront logs out when it ends.
+    const token = signUserToken({ id: user.id, phone: user.phone });
 
     return Response.json({
       success: true,
       message: "OTP verified successfully",
       token,
-      user,
+      // Only what the client uses — never the password hash or other columns.
+      user: { id: user.id, name: user.name, phone: user.phone, email: user.email },
       role: user.role || null,
       isNewUser,
     });

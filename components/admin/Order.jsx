@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Pagination from "@/components/admin/Pagination";
-import { FRONTEND_URL } from "@/lib/adminApi";
+import { SITE_URL } from "@/lib/siteConfig";
 import { toast } from "react-toastify";
 
 import {
@@ -538,10 +538,10 @@ export default function Orders() {
                               console.log("product_id:", order.product_id);
                               console.log(
                                 "URL:",
-                                `${FRONTEND_URL}/productPage/${order.product_id}`,
+                                `${SITE_URL}/productPage/${order.product_id}`,
                               );
                               window.open(
-                                `${FRONTEND_URL}/productPage/${order.product_id}`,
+                                `${SITE_URL}/productPage/${order.product_id}`,
                                 "_blank",
                               );
                             }}

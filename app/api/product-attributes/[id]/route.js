@@ -1,3 +1,4 @@
+import { withAdmin } from "@/lib/auth.js";
 import ProductAttribute from "@/lib/models/productAttributeModel.js";
 
 /* GET BY PRODUCT — :id here is actually the productId (matches original route's :productId) */
@@ -12,7 +13,7 @@ export async function GET(request, { params }) {
 }
 
 /* UPDATE VALUE — :id here is the ProductAttribute row id */
-export async function PUT(request, { params }) {
+async function handlePUT(request, { params }) {
   try {
     const { id } = await params;
     const { attribute_value_id } = await request.json();
@@ -24,3 +25,5 @@ export async function PUT(request, { params }) {
     return Response.json({ message: err.message }, { status: 500 });
   }
 }
+
+export const PUT = withAdmin(handlePUT);

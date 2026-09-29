@@ -1,13 +1,22 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
 import Link from "next/link";
 import { getUserToken } from "@/lib/authSession";
 
+function subscribeToStorage(onChange) {
+  window.addEventListener("storage", onChange);
+  return () => window.removeEventListener("storage", onChange);
+}
+
 /**
  * Only renders children when JWT exists. Used for checkout.
+ * The token lives in localStorage, which the server can't see: render nothing
+ * until hydration (server snapshot null) so server and client HTML match.
  */
 export default function RequireAuth({ children }) {
-  const token = getUserToken();
+  const token = useSyncExternalStore(subscribeToStorage, getUserToken, () => null);
+  if (token === null) return null;
   if (token) return children;
 
   const redirect = encodeURIComponent("/checkout");

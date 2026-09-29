@@ -1,3 +1,4 @@
+import { withAdmin } from "@/lib/auth.js";
 import About from "@/lib/models/aboutModel.js";
 import { saveUploadedFile, deleteUploadedFile } from "@/lib/upload.js";
 
@@ -62,7 +63,7 @@ export async function GET() {
 }
 
 /* ================= CREATE ABOUT ================= */
-export async function POST(request) {
+async function handlePOST(request) {
   try {
     const formData = await request.formData();
     const body = Object.fromEntries(formData.entries());
@@ -86,3 +87,5 @@ export async function POST(request) {
     return Response.json({ message: "Server Error" }, { status: 500 });
   }
 }
+
+export const POST = withAdmin(handlePOST);

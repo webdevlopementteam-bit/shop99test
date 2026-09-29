@@ -1,3 +1,4 @@
+import { withAdmin } from "@/lib/auth.js";
 import "@/lib/models/relations.js";
 import ProductReview from "@/lib/models/productReviewModel.js";
 import Product from "@/lib/models/productModel.js";
@@ -9,7 +10,7 @@ const reviewIncludeAdmin = [
   { model: Product, attributes: ["id", "name"] },
 ];
 
-export async function GET(request) {
+async function handleGET(request) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const page = Math.max(1, parseInt(searchParams.get("page"), 10) || 1);
@@ -36,7 +37,7 @@ export async function GET(request) {
   }
 }
 
-export async function POST(request) {
+async function handlePOST(request) {
   try {
     const formData = await request.formData();
     const body = Object.fromEntries([...formData.entries()].filter(([, v]) => typeof v === "string"));
@@ -123,3 +124,7 @@ export async function POST(request) {
     return Response.json({ message: error.message || "Error creating review" }, { status: 500 });
   }
 }
+
+export const GET = withAdmin(handleGET);
+
+export const POST = withAdmin(handlePOST);

@@ -25,8 +25,15 @@ const __dirname = path.dirname(__filename);
 
 /* ================= CONFIG ================= */
 
-const SITE_URL = process.env.SITEMAP_SITE_URL || "https://www.shop99.co.in";
-const API_BASE_URL = process.env.SITEMAP_API_URL || SITE_URL;
+// Both from env (see lib/siteConfig.js). SITEMAP_* override the defaults,
+// e.g. to read data from the live API while building a test site.
+const SITE_URL = String(process.env.SITEMAP_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || "").replace(/\/+$/, "");
+const API_BASE_URL = String(process.env.SITEMAP_API_URL || SITE_URL).replace(/\/+$/, "");
+
+if (!SITE_URL) {
+  console.error("❌ NEXT_PUBLIC_SITE_URL (or SITEMAP_SITE_URL) is not set — add it to .env / .env.local.");
+  process.exit(1);
+}
 
 const OUTPUT_PATH = path.join(__dirname, "..", "public", "sitemap.xml");
 

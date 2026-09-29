@@ -1,10 +1,10 @@
 import UserAddress from "@/lib/models/userAddressModel.js";
-import { requireAuth, AuthError, authErrorResponse } from "@/lib/auth.js";
+import { requireUser, AuthError, authErrorResponse } from "@/lib/auth.js";
 import { pickAddressPayload, hasRequiredAddressFields, clearOtherDefaults } from "@/lib/userAddressHelpers.js";
 
 export async function PUT(request, { params }) {
   try {
-    const user = requireAuth(request);
+    const user = requireUser(request);
     const { id } = await params;
 
     const address = await UserAddress.findOne({ where: { id, user_id: user.id } });
@@ -32,7 +32,7 @@ export async function PUT(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
-    const user = requireAuth(request);
+    const user = requireUser(request);
     const { id } = await params;
 
     const address = await UserAddress.findOne({ where: { id, user_id: user.id } });

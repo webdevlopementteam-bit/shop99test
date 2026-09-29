@@ -882,6 +882,9 @@ const Header = () => {
 
   const [searchText, setSearchText] = useState("");
   const [productCatalog, setProductCatalog] = useState([]);
+  // The full catalog (~1.4 MB) only feeds search suggestions, so it's fetched
+  // the first time a search box gets focus instead of on every page load.
+  const [catalogWanted, setCatalogWanted] = useState(false);
   const [searchSuggestions, setSearchSuggestions] = useState([]);
   const [categorySuggestions, setCategorySuggestions] = useState([]);
   const [showSearchSuggestions, setShowSearchSuggestions] = useState(false);
@@ -948,6 +951,7 @@ const Header = () => {
   }, [searchParams]);
 
   useEffect(() => {
+    if (!catalogWanted) return;
     let cancelled = false;
 
     (async () => {
@@ -994,7 +998,7 @@ const Header = () => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [catalogWanted]);
 
   const allCategoryNames = useMemo(() => {
     const names = collectCategoryNamesDeep(categories, []);
@@ -1524,7 +1528,10 @@ const Header = () => {
                     setSearchText(e.target.value);
                     setShowSearchSuggestions(true);
                   }}
-                  onFocus={() => setShowSearchSuggestions(true)}
+                  onFocus={() => {
+                    setShowSearchSuggestions(true);
+                    setCatalogWanted(true);
+                  }}
                   onBlur={() =>
                     setTimeout(() => setShowSearchSuggestions(false), 180)
                   }
@@ -1572,7 +1579,10 @@ const Header = () => {
                     setSearchText(e.target.value);
                     setShowSearchSuggestions(true);
                   }}
-                  onFocus={() => setShowSearchSuggestions(true)}
+                  onFocus={() => {
+                    setShowSearchSuggestions(true);
+                    setCatalogWanted(true);
+                  }}
                   onBlur={() =>
                     setTimeout(() => setShowSearchSuggestions(false), 180)
                   }

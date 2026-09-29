@@ -1,6 +1,6 @@
 import NewsletterSubscription from "@/lib/models/newsletterSubscriptionModel.js";
 import User from "@/lib/models/userModel.js";
-import { optionalAuth, AuthError, authErrorResponse } from "@/lib/auth.js";
+import { optionalAuth, AuthError, authErrorResponse, withAdmin } from "@/lib/auth.js";
 
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -46,7 +46,7 @@ export async function POST(request) {
   }
 }
 
-export async function GET() {
+async function handleGET() {
   try {
     const data = await NewsletterSubscription.findAll({ order: [["id", "DESC"]] });
     return Response.json(data);
@@ -55,3 +55,5 @@ export async function GET() {
     return Response.json({ message: "Failed to fetch subscriptions" }, { status: 500 });
   }
 }
+
+export const GET = withAdmin(handleGET);

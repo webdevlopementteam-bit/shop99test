@@ -1,3 +1,4 @@
+import { withAdmin } from "@/lib/auth.js";
 import "@/lib/models/relations.js";
 import Product from "@/lib/models/productModel.js";
 import Category from "@/lib/models/categoryModel.js";
@@ -122,7 +123,7 @@ export async function GET(request, { params }) {
 }
 
 /* ================= UPDATE ================= */
-export async function PUT(request, { params }) {
+async function handlePUT(request, { params }) {
   try {
     const { id: idRaw } = await params;
     const productId = parseInt(idRaw, 10);
@@ -255,7 +256,7 @@ export async function PUT(request, { params }) {
 }
 
 /* ================= DELETE ================= */
-export async function DELETE(request, { params }) {
+async function handleDELETE(request, { params }) {
   try {
     const { id } = await params;
 
@@ -268,3 +269,7 @@ export async function DELETE(request, { params }) {
     return Response.json({ message: "Delete failed" }, { status: 500 });
   }
 }
+
+export const PUT = withAdmin(handlePUT);
+
+export const DELETE = withAdmin(handleDELETE);

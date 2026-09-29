@@ -1,9 +1,9 @@
 import Wishlist from "@/lib/models/Wishlist.js";
-import { requireAuth, AuthError, authErrorResponse } from "@/lib/auth.js";
+import { requireUser, AuthError, authErrorResponse } from "@/lib/auth.js";
 
 export async function DELETE(request, { params }) {
   try {
-    const user = requireAuth(request);
+    const user = requireUser(request);
     const { productId } = await params;
 
     await Wishlist.destroy({ where: { UserId: user.id, ProductId: productId } });

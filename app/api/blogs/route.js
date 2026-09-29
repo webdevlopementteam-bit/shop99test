@@ -1,3 +1,4 @@
+import { withAdmin } from "@/lib/auth.js";
 import Blogs from "@/lib/models/blogsModel.js";
 import { saveUploadedFile } from "@/lib/upload.js";
 import { buildMetaDescription } from "@/lib/utils/slugify.js";
@@ -15,7 +16,7 @@ export async function GET() {
 }
 
 /* ================= CREATE ================= */
-export async function POST(request) {
+async function handlePOST(request) {
   try {
     const formData = await request.formData();
     const { title, content, slug, meta_title, meta_description, meta_keywords } = Object.fromEntries(
@@ -53,3 +54,5 @@ export async function POST(request) {
     return Response.json({ message: "Server Error" }, { status: 500 });
   }
 }
+
+export const POST = withAdmin(handlePOST);

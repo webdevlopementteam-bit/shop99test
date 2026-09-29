@@ -1,3 +1,4 @@
+import { withAdmin } from "@/lib/auth.js";
 import { pickCategorySeo, saveCategorySeo } from "@/lib/categorySeo.js";
 import "@/lib/models/relations.js";
 import Category from "@/lib/models/categoryModel.js";
@@ -58,7 +59,7 @@ export async function GET(request) {
 }
 
 /* ================= CREATE ================= */
-export async function POST(request) {
+async function handlePOST(request) {
   try {
     const formData = await request.formData();
     const body = Object.fromEntries(formData.entries());
@@ -104,3 +105,5 @@ export async function POST(request) {
     return Response.json({ message: err.message }, { status: 500 });
   }
 }
+
+export const POST = withAdmin(handlePOST);

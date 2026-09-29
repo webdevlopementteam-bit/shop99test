@@ -1,3 +1,4 @@
+import { withAdmin } from "@/lib/auth.js";
 import { revalidatePath } from "next/cache";
 import SEO from "@/lib/models/seoModel.js";
 import { saveUploadedFile } from "@/lib/upload.js";
@@ -18,7 +19,7 @@ export async function GET() {
 }
 
 /* ================= CREATE ================= */
-export async function POST(request) {
+async function handlePOST(request) {
   try {
     const formData = await request.formData();
     const body = Object.fromEntries(formData.entries());
@@ -50,3 +51,5 @@ export async function POST(request) {
     return Response.json({ success: false, message: error.message }, { status: 500 });
   }
 }
+
+export const POST = withAdmin(handlePOST);

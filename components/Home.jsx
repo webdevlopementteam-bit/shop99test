@@ -25,6 +25,7 @@ import { countProductVariantsInPayload } from "@/lib/productVariants";
 import { getProductCategoryLabel } from "@/lib/productCategory";
 import { getProductDisplayPricing } from "@/lib/productPricing";
 import { getUserToken } from "@/lib/authSession";
+import { responsiveImage } from "@/lib/imageUrl";
 
 const wheel = "/assets/products/sound-fire.jpeg";
 const ads1 = "/assets/home/ads-1.jpg";
@@ -327,8 +328,13 @@ const Home = ({ initialBanners = null }) => {
               className="group relative rounded-2xl overflow-hidden min-h-[220px] sm:min-h-[250px] w-full text-left"
             >
               <img
-                src={item.image}
+                {...responsiveImage(item.image, {
+                  sizes: "(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw",
+                  maxWidth: 1200,
+                })}
                 alt={item.title}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-[220px] sm:h-[250px] object-cover transition-transform duration-500 group-hover:scale-105"
               />
             </button>

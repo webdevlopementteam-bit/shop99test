@@ -1,12 +1,12 @@
 import { Op } from "sequelize";
 import User from "@/lib/models/userModel.js";
-import { requireAuth, AuthError, authErrorResponse } from "@/lib/auth.js";
+import { requireUser, AuthError, authErrorResponse } from "@/lib/auth.js";
 import { saveUploadedFile } from "@/lib/upload.js";
 
 /* ================= GET PROFILE ================= */
 export async function GET(request) {
   try {
-    const user = requireAuth(request);
+    const user = requireUser(request);
 
     const dbUser = await User.findByPk(user.id, {
       attributes: ["id", "name", "phone", "email", "city", "image", "role"],
@@ -28,7 +28,7 @@ export async function GET(request) {
 /* ================= UPDATE PROFILE ================= */
 export async function PUT(request) {
   try {
-    const authUser = requireAuth(request);
+    const authUser = requireUser(request);
     const formData = await request.formData();
     const { name, email, city } = Object.fromEntries(formData.entries());
 

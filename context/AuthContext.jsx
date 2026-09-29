@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
-import { clearUserSession, USER_SESSION_EXPIRED_EVENT } from "@/lib/authSession";
+import { clearUserSession, scheduleUserSessionExpiry, USER_SESSION_EXPIRED_EVENT } from "@/lib/authSession";
 
 const AuthContext = createContext();
 
@@ -22,7 +22,12 @@ export const AuthProvider = ({ children }) => {
 
     const onExpired = () => setUser(null);
     window.addEventListener(USER_SESSION_EXPIRED_EVENT, onExpired);
-    return () => window.removeEventListener(USER_SESSION_EXPIRED_EVENT, onExpired);
+    // Auto-logout when the 7-day login runs out (also if it already has).
+    const cancelExpiry = scheduleUserSessionExpiry();
+    return () => {
+      window.removeEventListener(USER_SESSION_EXPIRED_EVENT, onExpired);
+      cancelExpiry();
+    };
   }, []);
 
   const login = (userData, token) => {

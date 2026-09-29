@@ -1,3 +1,4 @@
+import { withAdmin } from "@/lib/auth.js";
 import Footer from "@/lib/models/footerModel.js";
 import { saveUploadedFile, deleteUploadedFile } from "@/lib/upload.js";
 
@@ -10,7 +11,7 @@ const safeParse = (data) => {
 };
 
 /* ================= UPDATE ================= */
-export async function PUT(request, { params }) {
+async function handlePUT(request, { params }) {
   try {
     const { id } = await params;
     const footer = await Footer.findByPk(id);
@@ -42,7 +43,7 @@ export async function PUT(request, { params }) {
 }
 
 /* ================= DELETE ================= */
-export async function DELETE(request, { params }) {
+async function handleDELETE(request, { params }) {
   try {
     const { id } = await params;
     const footer = await Footer.findByPk(id);
@@ -57,3 +58,7 @@ export async function DELETE(request, { params }) {
     return Response.json({ message: err.message }, { status: 500 });
   }
 }
+
+export const PUT = withAdmin(handlePUT);
+
+export const DELETE = withAdmin(handleDELETE);

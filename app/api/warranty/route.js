@@ -1,6 +1,6 @@
 import Warranty from "@/lib/models/warrantyModel.js";
 import Order from "@/lib/models/orderModel.js";
-import { optionalAuth, AuthError, authErrorResponse } from "@/lib/auth.js";
+import { optionalAuth, AuthError, authErrorResponse, withAdmin } from "@/lib/auth.js";
 import { saveUploadedFile } from "@/lib/upload.js";
 
 const ALLOWED_PURCHASE_SOURCES = ["shop99", "other"];
@@ -69,7 +69,7 @@ export async function POST(request) {
 }
 
 /* admin panel */
-export async function GET() {
+async function handleGET() {
   try {
     const rows = await Warranty.findAll({ order: [["id", "DESC"]] });
     return Response.json({ data: rows });
@@ -77,3 +77,5 @@ export async function GET() {
     return Response.json({ message: err.message }, { status: 500 });
   }
 }
+
+export const GET = withAdmin(handleGET);

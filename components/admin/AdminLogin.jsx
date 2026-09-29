@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { Phone, Lock, Loader2 } from "lucide-react";
 import { getStoredAuthToken, loginAdminApi, persistAuthToken, pickTokenFromAuthResponse } from "@/lib/adminApi";
 import { useAdminAuth } from "@/context/AdminAuthContext";
+import { scheduleAdminSessionExpiry } from "@/lib/authSession";
 
 function apiErrorMessage(err) {
   const d = err?.response?.data;
@@ -23,6 +24,9 @@ export default function AdminLogin() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
+    // Drops an already-expired token first, so it doesn't bounce us to the
+    // dashboard and straight back.
+    scheduleAdminSessionExpiry()();
     if (getStoredAuthToken()) {
       router.replace("/admin");
     }

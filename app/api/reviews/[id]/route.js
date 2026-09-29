@@ -2,12 +2,12 @@ import "@/lib/models/relations.js";
 import ProductReview from "@/lib/models/productReviewModel.js";
 import Product from "@/lib/models/productModel.js";
 import User from "@/lib/models/userModel.js";
-import { requireAuth, AuthError, authErrorResponse } from "@/lib/auth.js";
+import { requireUser, AuthError, authErrorResponse } from "@/lib/auth.js";
 import { parseReviewedAt, resolveImagesForUpdate, parseRating } from "@/lib/reviewHelpers.js";
 
 export async function PUT(request, { params }) {
   try {
-    const authUser = requireAuth(request);
+    const authUser = requireUser(request);
     const userId = authUser.id;
     const { id } = await params;
 
@@ -68,7 +68,7 @@ export async function PUT(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
-    const authUser = requireAuth(request);
+    const authUser = requireUser(request);
     const userId = authUser.id;
     const { id } = await params;
 

@@ -1,8 +1,9 @@
+import { withAdmin } from "@/lib/auth.js";
 import Warranty from "@/lib/models/warrantyModel.js";
 
 const ALLOWED_STATUSES = ["pending", "approved", "rejected", "completed"];
 
-export async function PUT(request, { params }) {
+async function handlePUT(request, { params }) {
   try {
     const { id } = await params;
     const body = await request.json();
@@ -24,3 +25,5 @@ export async function PUT(request, { params }) {
     return Response.json({ message: err.message }, { status: 500 });
   }
 }
+
+export const PUT = withAdmin(handlePUT);

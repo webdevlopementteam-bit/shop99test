@@ -1,11 +1,11 @@
 import "@/lib/models/relations.js";
 import Wishlist from "@/lib/models/Wishlist.js";
 import Product from "@/lib/models/productModel.js";
-import { requireAuth, AuthError, authErrorResponse } from "@/lib/auth.js";
+import { requireUser, AuthError, authErrorResponse } from "@/lib/auth.js";
 
 export async function POST(request) {
   try {
-    const user = requireAuth(request);
+    const user = requireUser(request);
     const { productId } = await request.json();
 
     await Wishlist.create({ UserId: user.id, ProductId: productId });
@@ -19,7 +19,7 @@ export async function POST(request) {
 
 export async function GET(request) {
   try {
-    const user = requireAuth(request);
+    const user = requireUser(request);
 
     const items = await Wishlist.findAll({
       where: { UserId: user.id },

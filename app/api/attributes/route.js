@@ -1,8 +1,9 @@
+import { withAdmin } from "@/lib/auth.js";
 import Attribute from "@/lib/models/attributeModel.js";
 import AttributeValue from "@/lib/models/attributeValueModel.js";
 
 /* CREATE */
-export async function POST(request) {
+async function handlePOST(request) {
   try {
     const { name, is_published, variants } = await request.json();
 
@@ -34,3 +35,5 @@ export async function GET() {
     return Response.json({ message: err.message }, { status: 500 });
   }
 }
+
+export const POST = withAdmin(handlePOST);

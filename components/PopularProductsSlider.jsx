@@ -8,6 +8,7 @@ import { BASE_URL } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { getProductDisplayPricing } from "@/lib/productPricing";
 import { setNavState } from "@/lib/navState";
+import { optimizedSrc, responsiveImage } from "@/lib/imageUrl";
 
 const popularDesktop = "/assets/home/popular-picks.jpeg";
 const popularMobile = "/assets/home/popularpick-mobile.jpeg";
@@ -62,8 +63,10 @@ const PopularProductsSlider = ({ popularProducts, toggleWishlist, wishlistIds, h
 
               <div className="relative">
                 <img
-                  src={item?.image ? `${BASE_URL}/uploads/${item.image}` : "/no-image.png"}
+                  src={item?.image ? optimizedSrc(`${BASE_URL}/uploads/${item.image}`, 640) : "/no-image.png"}
                   alt={item?.name || "Product"}
+                  loading="lazy"
+                  decoding="async"
                   className="h-44 mx-auto object-contain transition duration-300 group-hover:opacity-30"
                   onError={(e) => {
                     // Fallback once — never loop if the placeholder itself fails.
@@ -204,7 +207,14 @@ const PopularProductsSlider = ({ popularProducts, toggleWishlist, wishlistIds, h
 
       <div className="block lg:hidden border rounded-2xl bg-white overflow-hidden">
         <button type="button" onClick={() => router.push("/shop")} className="w-full">
-          <img src={popularMobile} alt="Popular Picks Banner" className="w-full h-[310px] object-cover" />
+          {/* lazy: the hidden (display:none) variant is then never downloaded */}
+          <img
+            {...responsiveImage(popularMobile, { sizes: "100vw", maxWidth: 1200 })}
+            alt="Popular Picks Banner"
+            loading="lazy"
+            decoding="async"
+            className="w-full h-[310px] object-cover"
+          />
         </button>
 
         <div className="p-4">
@@ -218,7 +228,13 @@ const PopularProductsSlider = ({ popularProducts, toggleWishlist, wishlistIds, h
 
       <div className="hidden lg:grid lg:grid-cols-5 border rounded-2xl bg-white overflow-hidden">
         <button type="button" onClick={() => router.push("/shop")} className="w-full h-full">
-          <img src={popularDesktop} alt="Popular Picks Banner" className="w-full h-full object-cover" />
+          <img
+            {...responsiveImage(popularDesktop, { sizes: "20vw", maxWidth: 640 })}
+            alt="Popular Picks Banner"
+            loading="lazy"
+            decoding="async"
+            className="w-full h-full object-cover"
+          />
         </button>
 
         <div className="col-span-4 p-4 min-w-0">

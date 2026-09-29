@@ -1,3 +1,4 @@
+import { withAdmin } from "@/lib/auth.js";
 import About from "@/lib/models/aboutModel.js";
 import { saveUploadedFile, deleteUploadedFile } from "@/lib/upload.js";
 
@@ -63,7 +64,7 @@ export async function GET(request, { params }) {
 }
 
 /* ================= UPDATE ABOUT ================= */
-export async function PUT(request, { params }) {
+async function handlePUT(request, { params }) {
   try {
     const { id } = await params;
     const about = await About.findByPk(id);
@@ -89,7 +90,7 @@ export async function PUT(request, { params }) {
 }
 
 /* ================= DELETE ABOUT ================= */
-export async function DELETE(request, { params }) {
+async function handleDELETE(request, { params }) {
   try {
     const { id } = await params;
     const about = await About.findByPk(id);
@@ -106,3 +107,7 @@ export async function DELETE(request, { params }) {
     return Response.json({ message: "Server Error" }, { status: 500 });
   }
 }
+
+export const PUT = withAdmin(handlePUT);
+
+export const DELETE = withAdmin(handleDELETE);

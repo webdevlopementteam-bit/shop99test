@@ -1,3 +1,4 @@
+import { withAdmin } from "@/lib/auth.js";
 import Deal from "@/lib/models/dealModel.js";
 import Product from "@/lib/models/productModel.js";
 
@@ -23,7 +24,7 @@ const discountedPriceForDeal = (basePrice, discountType, discountValue) => {
 };
 
 /* ================= UPDATE ================= */
-export async function PUT(request, { params }) {
+async function handlePUT(request, { params }) {
   try {
     const { id } = await params;
     const { product_id, discount_type, discount_value } = await request.json();
@@ -92,7 +93,7 @@ export async function PUT(request, { params }) {
 }
 
 /* ================= DELETE ================= */
-export async function DELETE(request, { params }) {
+async function handleDELETE(request, { params }) {
   try {
     const { id } = await params;
 
@@ -103,3 +104,7 @@ export async function DELETE(request, { params }) {
     return Response.json({ error: error.message }, { status: 500 });
   }
 }
+
+export const PUT = withAdmin(handlePUT);
+
+export const DELETE = withAdmin(handleDELETE);

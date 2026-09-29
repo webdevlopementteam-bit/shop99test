@@ -1,3 +1,4 @@
+import { withAdmin } from "@/lib/auth.js";
 import Product from "@/lib/models/productModel.js";
 import { syncProductShipping, getShippingStateRatesObject } from "@/lib/services/shippingSync.js";
 
@@ -32,7 +33,7 @@ export async function GET(request, { params }) {
   }
 }
 
-export async function PUT(request, { params }) {
+async function handlePUT(request, { params }) {
   try {
     const { productId: productIdRaw } = await params;
     const productId = parseInt(productIdRaw, 10);
@@ -66,3 +67,5 @@ export async function PUT(request, { params }) {
     return Response.json({ message: err.message || "Failed to save shipping" }, { status: 500 });
   }
 }
+
+export const PUT = withAdmin(handlePUT);

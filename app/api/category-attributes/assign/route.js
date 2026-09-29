@@ -1,3 +1,4 @@
+import { withAdmin } from "@/lib/auth.js";
 import { Op } from "sequelize";
 import CategoryAttributeMap from "@/lib/models/categoryAttributeMapModel.js";
 import Attribute from "@/lib/models/attributeModel.js";
@@ -22,7 +23,7 @@ async function filterExistingAttributeIds(ids) {
   return { valid, invalid };
 }
 
-export async function POST(request) {
+async function handlePOST(request) {
   try {
     const { category_id, attribute_ids, apply_to_sub, extra_ids } = await request.json();
 
@@ -148,3 +149,5 @@ export async function POST(request) {
     return Response.json({ message: err.message }, { status: 500 });
   }
 }
+
+export const POST = withAdmin(handlePOST);

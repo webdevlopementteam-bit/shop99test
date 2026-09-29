@@ -78,7 +78,26 @@ export default function ShopPage() {
 
   /* ================= LOAD DATA ================= */
 
+  // Categories + brands: once. (They used to be refetched inside the products
+  // effect, which also depended on `brands` — every setBrands() re-ran it:
+  // an endless request loop, ~200 API calls per second per open tab.)
   useEffect(() => {
+    let ignore = false;
+    Promise.all([getCategoriesApi(), getBrandsApi()])
+      .then(([categoryRes, brandRes]) => {
+        if (ignore) return;
+        setCategories(Array.isArray(categoryRes) ? categoryRes : categoryRes?.categories || []);
+        setBrands(Array.isArray(brandRes) ? brandRes : []);
+      })
+      .catch((err) => console.error("Shop filters load error:", err));
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  // Products: whenever the query, page or brand filter changes.
+  useEffect(() => {
+    let ignore = false;
     const load = async () => {
       try {
         const categoryMain = searchParams.get("category") || "";
@@ -99,6 +118,7 @@ export default function ShopPage() {
           page,
           limit: 20,
         });
+        if (ignore) return; // a newer filter change already started another load
 
         const rows = productRes?.data?.data || productRes?.data || [];
         setProducts(Array.isArray(rows) ? rows : []);
@@ -108,20 +128,19 @@ export default function ShopPage() {
         if (typeof tp === "number" && tp >= 1) {
           setTotalPages(tp);
         }
-
-        const categoryRes = await getCategoriesApi();
-        const brandRes = await getBrandsApi();
-
-        const categoryRows = Array.isArray(categoryRes) ? categoryRes : categoryRes?.categories || [];
-        setCategories(categoryRows);
-        setBrands(brandRes || []);
       } catch (err) {
+        if (ignore) return;
         console.error("Shop Load Error:", err);
         setProducts([]);
       }
     };
 
+    // A brand filter needs the brand list to resolve its name; wait for it.
+    if (selectedBrand && !brands.length) return;
     load();
+    return () => {
+      ignore = true;
+    };
   }, [searchParams, page, selectedBrand, brands]);
 
   useEffect(() => {

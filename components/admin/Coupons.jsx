@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BASE_URL, getStoredAuthToken } from "@/lib/adminApi";
+import { BASE_URL, getStoredAuthToken, adminFetch } from "@/lib/adminApi";
 import ProductDropdown from "@/components/admin/ProductDropdown";
 import CategoryDropdown from "@/components/admin/CategoryDropdown";
 
@@ -34,11 +34,11 @@ export default function Coupons() {
   useEffect(() => {
     fetchCoupons();
 
-    fetch(`${BASE_URL}/api/products`)
+    adminFetch(`${BASE_URL}/api/products`)
       .then(res => res.json())
       .then(data => setProducts(data.data || []));
 
-    fetch(`${BASE_URL}/api/categories`)
+    adminFetch(`${BASE_URL}/api/categories`)
       .then(res => res.json())
       // .then(data => setCategories(data));
       .then(data => setCategories(data.data || data.categories || []));
@@ -46,7 +46,7 @@ export default function Coupons() {
   }, []);
 
   const fetchCoupons = () => {
-  fetch(`${BASE_URL}/api/coupons`)
+  adminFetch(`${BASE_URL}/api/coupons`)
     .then(res => res.json())
     .then(data => {
       console.log("API RESPONSE:", data);
@@ -92,7 +92,7 @@ export default function Coupons() {
 
     const method = editingId ? "PUT" : "POST";
 
-   await fetch(url, {
+   await adminFetch(url, {
       method,
       headers: {
         "Content-Type": "application/json",
@@ -148,7 +148,7 @@ export default function Coupons() {
 
     if (!window.confirm("Delete this coupon?")) return;
 
-    await fetch(`${BASE_URL}/api/coupons/${id}`, {
+    await adminFetch(`${BASE_URL}/api/coupons/${id}`, {
       method: "DELETE",
       headers: {
       Authorization: `Bearer ${token}` // 🔥 ADD

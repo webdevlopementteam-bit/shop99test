@@ -1,10 +1,11 @@
+import { withAdmin } from "@/lib/auth.js";
 import fs from "fs";
 import Order from "@/lib/models/orderModel.js";
 import { createLabelPDF } from "@/lib/services/pdfService.js";
 import { ensureLabelPdf } from "@/lib/orderHelpers.js";
 
 /* ================= GENERATE LABEL ================= */
-export async function POST(request, { params }) {
+async function handlePOST(request, { params }) {
   try {
     const { id } = await params;
     const orderInstance = await Order.findByPk(id);
@@ -28,7 +29,7 @@ export async function POST(request, { params }) {
 }
 
 /* ================= DOWNLOAD LABEL ================= */
-export async function GET(request, { params }) {
+async function handleGET(request, { params }) {
   try {
     const { id } = await params;
     const orderInstance = await Order.findByPk(id);
@@ -62,3 +63,7 @@ export async function GET(request, { params }) {
     return Response.json({ message: err.message }, { status: 500 });
   }
 }
+
+export const POST = withAdmin(handlePOST);
+
+export const GET = withAdmin(handleGET);

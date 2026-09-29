@@ -1,3 +1,4 @@
+import { withAdmin } from "@/lib/auth.js";
 import { Op } from "sequelize";
 import Deal from "@/lib/models/dealModel.js";
 import Product from "@/lib/models/productModel.js";
@@ -62,7 +63,7 @@ const resolveProductOfferByIds = (productId, categoryId, offers) => {
 };
 
 /* ================= ADD ================= */
-export async function POST(request) {
+async function handlePOST(request) {
   try {
     const body = await request.json();
     const { deals, productIds, discount_type, discount_value } = body;
@@ -172,3 +173,5 @@ export async function GET() {
     return Response.json({ error: error.message }, { status: 500 });
   }
 }
+
+export const POST = withAdmin(handlePOST);

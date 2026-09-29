@@ -14,6 +14,7 @@ import {
 import { useRouter } from "next/navigation";
 import { INDIAN_STATES } from "@/lib/constants/indianStates";
 import { consumeNavState } from "@/lib/navState";
+import { SITE_URL } from "@/lib/siteConfig";
 
 function safeParseBuyNow() {
   try {
@@ -95,8 +96,7 @@ export default function Checkout() {
   const FRONT_URL =
     typeof window !== "undefined" && window.location?.origin
       ? window.location.origin.replace(/\/$/, "")
-      : String(process.env.NEXT_PUBLIC_SITE_URL || "").replace(/\/$/, "") ||
-        BASE_URL.replace("api.", "").replace(/\/$/, "");
+      : SITE_URL;
 
   const [navState] = useState(() => consumeNavState("checkout"));
   const navigatedBuyNow = navState?.type === "buyNow";
@@ -647,14 +647,16 @@ export default function Checkout() {
       surl.type = "hidden";
       surl.name = "surl";
       // surl.value = `${FRONT_URL}/payment-success`;
-      surl.value = `${BASE_URL}/api/orders/payu/success`;
+      // Absolute URL on the site the user is on — PayU resolves a relative
+      // one against its own domain (txncdn.payubiz.in/api/orders/payu/success).
+      surl.value = `${FRONT_URL}/api/orders/payu/success`;
       form.appendChild(surl);
 
       const furl = document.createElement("input");
       furl.type = "hidden";
       furl.name = "furl";
       // furl.value = `${FRONT_URL}/payment-failure`;
-      furl.value = `${BASE_URL}/api/orders/payu/failure`;
+      furl.value = `${FRONT_URL}/api/orders/payu/failure`;
       form.appendChild(furl);
 
       /* PayU success URL par txnid kabhi-kabhi POST body mein aata hai, URL mein nahi — success page par dikhane / verify ke liye */

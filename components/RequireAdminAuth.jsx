@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { getStoredAuthToken } from "@/lib/adminApi";
 import { useAdminAuth } from "@/context/AdminAuthContext";
+import { scheduleAdminSessionExpiry } from "@/lib/authSession";
 
 // Another tab logging out/in changes the admin token.
 function subscribeToStorage(onChange) {
@@ -27,6 +28,12 @@ export default function RequireAdminAuth({ children }) {
   useEffect(() => {
     if (token === "") router.replace("/admin/login");
   }, [token, router]);
+
+  // Log out to /admin/login the moment the admin JWT expires (immediately if
+  // it already has) instead of pages failing with "Unauthorized".
+  useEffect(() => {
+    if (token) return scheduleAdminSessionExpiry();
+  }, [token]);
 
   if (token === null || (token && loading)) {
     return (

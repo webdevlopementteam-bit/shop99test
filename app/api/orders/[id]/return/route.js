@@ -1,4 +1,6 @@
 import Order from "@/lib/models/orderModel.js";
+import { requireOrderAccess } from "@/lib/orderAccess.js";
+import { AuthError, authErrorResponse } from "@/lib/auth.js";
 import { notifyOrderStatusChangeAsync } from "@/lib/services/orderStatusSms.js";
 import {
   pickRefundPayload,
@@ -18,6 +20,18 @@ export async function PUT(request, { params }) {
 
     if (!order) {
       return Response.json({ message: "Order not found" }, { status: 404 });
+    }
+
+    // Admin may move return/replacement through any status; the customer who
+    // placed the order may only raise a request.
+    const access = await requireOrderAccess(request, order);
+    if (!access.isAdmin) {
+      const onlyRequests = [return_status, replacement_status].every(
+        (v) => v == null || v === "" || String(v).trim().toLowerCase() === "requested",
+      );
+      if (!onlyRequests) {
+        return Response.json({ message: "Only an admin can update this request" }, { status: 403 });
+      }
     }
 
     const prevReplacementStatus = order.replacement_status;
@@ -137,6 +151,7 @@ export async function PUT(request, { params }) {
 
     return Response.json({ success: true, data: order });
   } catch (err) {
+    if (err instanceof AuthError) return authErrorResponse(err);
     return Response.json({ message: err.message }, { status: 500 });
   }
 }

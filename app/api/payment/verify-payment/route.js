@@ -1,4 +1,5 @@
 import Order from "@/lib/models/orderModel.js";
+import { isGenuinePayuResponse } from "@/lib/payuVerify.js";
 
 /* ================= VERIFY PAYMENT ================= */
 export async function POST(request) {
@@ -13,8 +14,13 @@ export async function POST(request) {
       return Response.json({ success: false, message: "Order not found" }, { status: 404 });
     }
     const currentStatus = String(order.status || "").trim().toLowerCase();
-    const payuStatus = String(r.status || "").trim().toLowerCase();
-    const unmapped = String(r.unmappedstatus || r.unmapped_status || "").trim().toLowerCase();
+    // The result pages forward whatever is in their URL, so status fields are
+    // only acted on when PayU's hash vouches for them. Otherwise this just
+    // reports the order's current status (the surl/furl routes, which do
+    // verify the hash, are what change it).
+    const genuine = isGenuinePayuResponse(r);
+    const payuStatus = genuine ? String(r.status || "").trim().toLowerCase() : "";
+    const unmapped = genuine ? String(r.unmappedstatus || r.unmapped_status || "").trim().toLowerCase() : "";
     const isSuccessStatus =
       payuStatus === "success" || payuStatus === "captured" || payuStatus === "paid" || payuStatus === "completed";
     const isFailureStatus =

@@ -1,7 +1,10 @@
 import Script from "next/script";
 import "./globals.css";
+import { SITE_URL } from "@/lib/siteConfig";
 
 export const metadata = {
+  // Fallback for pages without their own title (cart, login, checkout, …).
+  title: "Shop99",
   icons: {
     icon: [
       { url: "/favicon.ico?v=4" },
@@ -25,8 +28,8 @@ const ORGANIZATION_SCHEMA = {
   "@type": "Organization",
   name: "Shop99",
   alternateName: "Prakash Electronics (India)",
-  url: "https://www.shop99.co.in",
-  logo: "https://www.shop99.co.in/favicon.png",
+  url: SITE_URL,
+  logo: `${SITE_URL}/favicon.png`,
 };
 
 export default function RootLayout({ children }) {

@@ -1,10 +1,10 @@
 import UserAddress from "@/lib/models/userAddressModel.js";
-import { requireAuth, AuthError, authErrorResponse } from "@/lib/auth.js";
+import { requireUser, AuthError, authErrorResponse } from "@/lib/auth.js";
 import { pickAddressPayload, hasRequiredAddressFields, clearOtherDefaults } from "@/lib/userAddressHelpers.js";
 
 export async function GET(request) {
   try {
-    const user = requireAuth(request);
+    const user = requireUser(request);
     const rows = await UserAddress.findAll({
       where: { user_id: user.id },
       order: [
@@ -21,7 +21,7 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const user = requireAuth(request);
+    const user = requireUser(request);
     const body = await request.json();
     const payload = pickAddressPayload(body);
     if (!hasRequiredAddressFields(payload)) {

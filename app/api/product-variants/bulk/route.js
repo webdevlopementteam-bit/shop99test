@@ -1,3 +1,4 @@
+import { withAdmin } from "@/lib/auth.js";
 import path from "node:path";
 import sequelize from "@/lib/db.js";
 import ProductVariant from "@/lib/models/productVariantModel.js";
@@ -74,7 +75,7 @@ async function filesGroupedByFieldname(formData) {
 }
 
 /* ================= BULK SAVE ================= */
-export async function POST(request) {
+async function handlePOST(request) {
   const formData = await request.formData();
   const body = Object.fromEntries(
     [...formData.entries()].filter(([, v]) => typeof v === "string"),
@@ -168,3 +169,5 @@ export async function POST(request) {
     return Response.json({ message: err.message }, { status: 500 });
   }
 }
+
+export const POST = withAdmin(handlePOST);

@@ -1,3 +1,4 @@
+import { withAdmin } from "@/lib/auth.js";
 import Blogs from "@/lib/models/blogsModel.js";
 import { saveUploadedFile } from "@/lib/upload.js";
 import { buildMetaDescription } from "@/lib/utils/slugify.js";
@@ -25,7 +26,7 @@ export async function GET(request, { params }) {
 }
 
 /* ================= UPDATE ================= */
-export async function PUT(request, { params }) {
+async function handlePUT(request, { params }) {
   try {
     const { id } = await params;
     const blog = await Blogs.findByPk(id);
@@ -77,7 +78,7 @@ export async function PUT(request, { params }) {
 }
 
 /* ================= DELETE ================= */
-export async function DELETE(request, { params }) {
+async function handleDELETE(request, { params }) {
   try {
     const { id } = await params;
     const blog = await Blogs.findByPk(id);
@@ -94,3 +95,7 @@ export async function DELETE(request, { params }) {
     return Response.json({ message: "Server Error" }, { status: 500 });
   }
 }
+
+export const PUT = withAdmin(handlePUT);
+
+export const DELETE = withAdmin(handleDELETE);

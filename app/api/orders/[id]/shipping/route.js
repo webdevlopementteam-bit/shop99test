@@ -1,6 +1,7 @@
+import { withAdmin } from "@/lib/auth.js";
 import Order from "@/lib/models/orderModel.js";
 
-export async function PUT(request, { params }) {
+async function handlePUT(request, { params }) {
   try {
     const { id } = await params;
     const { delivery_date, shipping_partner, tracking_id, tracking_link } = await request.json();
@@ -26,3 +27,5 @@ export async function PUT(request, { params }) {
     return Response.json({ message: err.message }, { status: 500 });
   }
 }
+
+export const PUT = withAdmin(handlePUT);

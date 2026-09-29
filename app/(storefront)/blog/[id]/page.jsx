@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import BlogDetail from "@/components/BlogDetail";
 import { getBlogByIdApi } from "@/lib/api";
 import { SITE_URL, uploadUrl, findSeoEntry, applySeoEntry } from "@/lib/seo";
@@ -7,8 +8,9 @@ const toText = (value) => (value == null ? "" : String(value).trim());
 async function fetchBlog(id) {
   try {
     return await getBlogByIdApi(id);
-  } catch {
-    return null;
+  } catch (err) {
+    if (err?.response?.status === 404) return null;
+    throw err;
   }
 }
 
@@ -45,6 +47,7 @@ export async function generateMetadata({ params }) {
 export default async function Page({ params }) {
   const { id } = await params;
   const blog = await fetchBlog(id);
+  if (!blog) notFound();
 
   return <BlogDetail id={id} initialBlog={blog} />;
 }

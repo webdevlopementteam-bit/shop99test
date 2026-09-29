@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BASE_URL } from "@/lib/adminApi";
+import { BASE_URL, adminFetch } from "@/lib/adminApi";
 import ProductDropdown from "@/components/admin/ProductDropdown";
 import CategoryDropdown from "@/components/admin/CategoryDropdown";
 import { toast } from "react-toastify";
@@ -31,17 +31,17 @@ export default function Offers() {
   useEffect(() => {
     fetchOffers();
 
-    fetch(`${BASE_URL}/api/products`)
+    adminFetch(`${BASE_URL}/api/products`)
       .then((res) => res.json())
       .then((data) => setProducts(data.data || data.products || []));
 
-    fetch(`${BASE_URL}/api/categories`)
+    adminFetch(`${BASE_URL}/api/categories`)
       .then((res) => res.json())
       .then((data) => setCategories(data.data || data.categories || []));
   }, []);
 
   const fetchOffers = () => {
-    fetch(`${BASE_URL}/api/offers`)
+    adminFetch(`${BASE_URL}/api/offers`)
       .then((res) => res.json())
       .then((data) => setOffers(data));
   };
@@ -92,7 +92,7 @@ const isExpired = (offer) => {
 
     const method = editingId ? "PUT" : "POST";
 
-    await fetch(url, {
+    await adminFetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -156,7 +156,7 @@ const isExpired = (offer) => {
             <button
               onClick={async () => {
                 try {
-                  await fetch(`${BASE_URL}/api/offers/${id}`, {
+                  await adminFetch(`${BASE_URL}/api/offers/${id}`, {
                     method: "DELETE",
                   });
 
@@ -190,7 +190,7 @@ const isExpired = (offer) => {
 
 const handleToggle = async (id) => {
   try {
-    const res = await fetch(`${BASE_URL}/api/offers/${id}/status`, {
+    const res = await adminFetch(`${BASE_URL}/api/offers/${id}/status`, {
       method: "PATCH",
     });
 
@@ -509,7 +509,7 @@ const handleToggle = async (id) => {
         <button
           onClick={async () => {
             try {
-              await fetch(`${BASE_URL}/api/offers/${deleteId}`, {
+              await adminFetch(`${BASE_URL}/api/offers/${deleteId}`, {
                 method: "DELETE"
               });
 

@@ -1,7 +1,8 @@
+import { withAdmin } from "@/lib/auth.js";
 import Brand from "@/lib/models/brandModel.js";
 import { saveUploadedFile } from "@/lib/upload.js";
 
-export async function PUT(request, { params }) {
+async function handlePUT(request, { params }) {
   try {
     const { id } = await params;
     const formData = await request.formData();
@@ -19,7 +20,7 @@ export async function PUT(request, { params }) {
   }
 }
 
-export async function DELETE(request, { params }) {
+async function handleDELETE(request, { params }) {
   try {
     const { id } = await params;
     await Brand.destroy({ where: { id } });
@@ -29,3 +30,7 @@ export async function DELETE(request, { params }) {
     return Response.json({ message: "Brand delete failed" }, { status: 500 });
   }
 }
+
+export const PUT = withAdmin(handlePUT);
+
+export const DELETE = withAdmin(handleDELETE);

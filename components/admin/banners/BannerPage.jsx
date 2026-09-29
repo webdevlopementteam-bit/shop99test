@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useEffect, useState, useMemo, useRef } from "react";
-import axios from "axios";
 import Pagination from "@/components/admin/Pagination";
-import { BASE_URL } from "@/lib/adminApi";
+import { BASE_URL, Api } from "@/lib/adminApi";
 
 function ProductDropdown({ products, value, onChange }) {
   const [query, setQuery] = useState("");
@@ -129,7 +128,7 @@ const BannerPage = () => {
   // ================= FETCH =================
   const fetchBanners = async () => {
     try {
-      const res = await axios.get(`${BASE_URL}/api/banners`);
+      const res = await Api.get(`/banners`);
       setBanners(res.data);
     } catch (error) {
       console.error("Fetch error:", error);
@@ -138,7 +137,7 @@ const BannerPage = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get(`${BASE_URL}/api/products`, {
+      const res = await Api.get(`/products`, {
         params: { page: 1, limit: 1000 }
       });
       setProducts(res.data?.data || []);
@@ -151,7 +150,7 @@ const BannerPage = () => {
   useEffect(() => {
     const loadBanners = async () => {
       try {
-        const res = await axios.get(`${BASE_URL}/api/banners`);
+        const res = await Api.get(`/banners`);
         setBanners(res.data);
       } catch (error) {
         console.error(error);
@@ -207,12 +206,12 @@ const BannerPage = () => {
       }
 
       if (form.id) {
-        await axios.put(
-          `${BASE_URL}/api/banners/${form.id}`,
+        await Api.put(
+          `/banners/${form.id}`,
           formData
         );
       } else {
-        await axios.post(`${BASE_URL}/api/banners`, formData);
+        await Api.post(`/banners`, formData);
       }
 
       resetForm();
@@ -244,7 +243,7 @@ const BannerPage = () => {
     if (!window.confirm("Delete this banner?")) return;
 
     try {
-      await axios.delete(`${BASE_URL}/api/banners/${id}`);
+      await Api.delete(`/banners/${id}`);
       fetchBanners();
     } catch (error) {
       console.error("Delete error:", error);

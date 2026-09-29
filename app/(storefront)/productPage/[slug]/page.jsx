@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import ProductPage from "@/components/ProductPage";
 import { getProductByIdApi } from "@/lib/api";
 import { SITE_URL, findSeoEntry, applySeoEntry } from "@/lib/seo";
@@ -16,8 +17,11 @@ async function fetchProduct(slug) {
       return { ...res, specifications: JSON.parse(res.specifications) };
     }
     return res;
-  } catch {
-    return null;
+  } catch (err) {
+    // Only a real "no such product" becomes a 404; other failures surface as
+    // errors instead of an empty page search engines would index.
+    if (err?.response?.status === 404) return null;
+    throw err;
   }
 }
 
@@ -73,6 +77,7 @@ export async function generateMetadata({ params }) {
 export default async function Page({ params }) {
   const { slug } = await params;
   const product = await fetchProduct(slug);
+  if (!product) notFound();
 
   return <ProductPage slug={slug} initialProduct={product} />;
 }

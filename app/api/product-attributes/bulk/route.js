@@ -1,7 +1,8 @@
+import { withAdmin } from "@/lib/auth.js";
 import ProductAttribute from "@/lib/models/productAttributeModel.js";
 import AttributeValue from "@/lib/models/attributeValueModel.js";
 
-export async function POST(request) {
+async function handlePOST(request) {
   try {
     const { product_id, attributes } = await request.json();
 
@@ -73,3 +74,5 @@ export async function POST(request) {
     return Response.json({ message: err.message }, { status: 500 });
   }
 }
+
+export const POST = withAdmin(handlePOST);

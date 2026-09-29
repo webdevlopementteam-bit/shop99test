@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination, EffectFade } from "swiper/modules";
 import { getBannersApi } from "@/lib/api";
+import { heroBackground, heroProduct } from "@/lib/imageUrl";
 
 import "swiper/css";
 import "swiper/css/effect-fade";
@@ -68,11 +69,21 @@ const HeroCarousel = ({ initialBanners = null }) => {
             <SwiperSlide key={banner.id}>
               <div
                 data-first={i === 0 ? "" : undefined}
-                className="hero-slide min-h-[420px] sm:min-h-[480px] md:h-[550px] lg:h-[600px] bg-cover bg-center flex items-center px-4 sm:px-8 lg:px-24 relative z-0 overflow-visible"
-                style={{
-                  backgroundImage: `url(${bg})`,
-                }}
+                className="hero-slide min-h-[420px] sm:min-h-[480px] md:h-[550px] lg:h-[600px] flex items-center px-4 sm:px-8 lg:px-24 relative z-0 overflow-visible"
               >
+                {/* background — an <img> (not CSS background) so the browser
+                    downloads only the size it needs, as WebP */}
+                {bg && (
+                  <img
+                    {...heroBackground(bg)}
+                    alt=""
+                    aria-hidden="true"
+                    loading={i === 0 ? "eager" : "lazy"}
+                    fetchPriority={i === 0 ? "high" : "auto"}
+                    className="absolute inset-0 h-full w-full object-cover object-center"
+                  />
+                )}
+
                 {/* overlay */}
                 <div className="absolute inset-0 bg-gradient-to-r from-white/90 to-transparent"></div>
 
@@ -124,7 +135,7 @@ const HeroCarousel = ({ initialBanners = null }) => {
               "
                 >
                   <img
-                    src={`/uploads/${banner.image}`}
+                    {...heroProduct(`/uploads/${banner.image}`)}
                     alt={banner.title}
                     // First slide is above the fold (and preloaded) — load it now.
                     loading={i === 0 ? "eager" : "lazy"}

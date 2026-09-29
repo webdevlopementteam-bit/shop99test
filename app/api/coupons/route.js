@@ -1,7 +1,8 @@
+import { withAdmin } from "@/lib/auth.js";
 import Coupon from "@/lib/models/couponModel.js";
 
 /* ================= CREATE COUPON ================= */
-export async function POST(request) {
+async function handlePOST(request) {
   try {
     const body = await request.json();
     const data = {
@@ -20,7 +21,7 @@ export async function POST(request) {
 }
 
 /* ================= GET ALL COUPONS ================= */
-export async function GET() {
+async function handleGET() {
   try {
     const coupons = await Coupon.findAll({ order: [["id", "DESC"]] });
     return Response.json(coupons);
@@ -28,3 +29,7 @@ export async function GET() {
     return Response.json({ message: "Failed to fetch coupons" }, { status: 500 });
   }
 }
+
+export const POST = withAdmin(handlePOST);
+
+export const GET = withAdmin(handleGET);

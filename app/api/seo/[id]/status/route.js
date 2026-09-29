@@ -1,6 +1,7 @@
+import { withAdmin } from "@/lib/auth.js";
 import SEO from "@/lib/models/seoModel.js";
 
-export async function PATCH(request, { params }) {
+async function handlePATCH(request, { params }) {
   try {
     const { id } = await params;
     const seo = await SEO.findByPk(id);
@@ -18,3 +19,5 @@ export async function PATCH(request, { params }) {
     return Response.json({ message: err.message }, { status: 500 });
   }
 }
+
+export const PATCH = withAdmin(handlePATCH);

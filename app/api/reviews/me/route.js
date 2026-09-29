@@ -1,12 +1,12 @@
 import "@/lib/models/relations.js";
 import ProductReview from "@/lib/models/productReviewModel.js";
 import Product from "@/lib/models/productModel.js";
-import { requireAuth, AuthError, authErrorResponse } from "@/lib/auth.js";
+import { requireUser, AuthError, authErrorResponse } from "@/lib/auth.js";
 import { orderByReviewDate } from "@/lib/reviewHelpers.js";
 
 export async function GET(request) {
   try {
-    const authUser = requireAuth(request);
+    const authUser = requireUser(request);
     const userId = authUser.id;
 
     const reviews = await ProductReview.findAll({

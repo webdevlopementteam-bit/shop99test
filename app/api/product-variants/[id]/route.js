@@ -1,3 +1,4 @@
+import { withAdmin } from "@/lib/auth.js";
 import sequelize from "@/lib/db.js";
 import ProductVariant from "@/lib/models/productVariantModel.js";
 import ProductVariantImage from "@/lib/models/productVariantImageModel.js";
@@ -24,7 +25,7 @@ async function syncProductFromVariants(product_id) {
  * Deletes one variant (and its gallery images).
  * Optional ?product_id= — 400 if it doesn't match.
  */
-export async function DELETE(request, { params }) {
+async function handleDELETE(request, { params }) {
   const { id: idRaw } = await params;
   const id = parseInt(idRaw, 10);
   if (!Number.isFinite(id) || id <= 0) {
@@ -59,3 +60,5 @@ export async function DELETE(request, { params }) {
     return Response.json({ message: err.message }, { status: 500 });
   }
 }
+
+export const DELETE = withAdmin(handleDELETE);

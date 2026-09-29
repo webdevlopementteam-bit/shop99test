@@ -1,3 +1,4 @@
+import { withAdmin } from "@/lib/auth.js";
 import { revalidatePath } from "next/cache";
 import "@/lib/models/relations.js";
 import Banner from "@/lib/models/bannerModel.js";
@@ -19,7 +20,7 @@ export async function GET() {
 }
 
 /* ================= CREATE ================= */
-export async function POST(request) {
+async function handlePOST(request) {
   try {
     const formData = await request.formData();
     const { title, subtitle, product_id } = Object.fromEntries(formData.entries());
@@ -43,3 +44,5 @@ export async function POST(request) {
     return Response.json({ error: "Server Error" }, { status: 500 });
   }
 }
+
+export const POST = withAdmin(handlePOST);

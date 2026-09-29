@@ -1,8 +1,8 @@
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import User from "@/lib/models/userModel.js";
+import { signUserToken } from "@/lib/auth.js";
 
-const generateToken = (id, role) => jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: "7d" });
+const generateToken = (id, role) => signUserToken({ id, role });
 
 export async function POST(request) {
   try {

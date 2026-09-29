@@ -1,9 +1,10 @@
+import { withAdmin } from "@/lib/auth.js";
 import "@/lib/models/relations.js";
 import Product from "@/lib/models/productModel.js";
 import Category from "@/lib/models/categoryModel.js";
 import Brand from "@/lib/models/brandModel.js";
 
-export async function GET() {
+async function handleGET() {
   try {
     const productCount = await Product.count();
     const categoryCount = await Category.count();
@@ -19,3 +20,5 @@ export async function GET() {
     return Response.json({ message: "Dashboard fetch failed" }, { status: 500 });
   }
 }
+
+export const GET = withAdmin(handleGET);

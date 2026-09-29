@@ -1,6 +1,7 @@
+import { withAdmin } from "@/lib/auth.js";
 import Offer from "@/lib/models/offerModel.js";
 
-export async function PATCH(request, { params }) {
+async function handlePATCH(request, { params }) {
   const { id } = await params;
   const offer = await Offer.findByPk(id);
 
@@ -13,3 +14,5 @@ export async function PATCH(request, { params }) {
 
   return Response.json({ message: "Status updated", data: offer });
 }
+
+export const PATCH = withAdmin(handlePATCH);

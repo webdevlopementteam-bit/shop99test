@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SITE_URL } from "@/lib/siteConfig";
 
 export default function ReturnPage() {
   return (
@@ -73,12 +74,12 @@ export default function ReturnPage() {
               Website refers to Shop99, accessible from
               {" "}
               <a
-                href="https://www.shop99.co.in/"
+                href={`${SITE_URL}/`}
                 className="text-blue-600 hover:underline"
                 target="_blank"
                 rel="noreferrer"
               >
-                https://www.shop99.co.in/
+                {`${SITE_URL}/`}
               </a>
               .
             </li>

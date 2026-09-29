@@ -1,3 +1,4 @@
+import { withAdmin } from "@/lib/auth.js";
 import { Op } from "sequelize";
 import "@/lib/models/relations.js";
 import Product from "@/lib/models/productModel.js";
@@ -176,7 +177,7 @@ export async function GET(request) {
 }
 
 /* ================= CREATE ================= */
-export async function POST(request) {
+async function handlePOST(request) {
   try {
     const formData = await request.formData();
     const body = Object.fromEntries([...formData.entries()].filter(([, v]) => typeof v === "string"));
@@ -254,3 +255,5 @@ export async function POST(request) {
     return Response.json({ message: err.message }, { status: 500 });
   }
 }
+
+export const POST = withAdmin(handlePOST);

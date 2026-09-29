@@ -1,6 +1,7 @@
+import { withAdmin } from "@/lib/auth.js";
 import User from "@/lib/models/userModel.js";
 
-export async function GET() {
+async function handleGET() {
   try {
     const users = await User.findAll({ order: [["createdAt", "DESC"]] });
     return Response.json(users);
@@ -9,3 +10,5 @@ export async function GET() {
     return Response.json({ message: "Failed to fetch users" }, { status: 500 });
   }
 }
+
+export const GET = withAdmin(handleGET);
