@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { withAdmin } from "@/lib/auth.js";
 import SEO from "@/lib/models/seoModel.js";
 
@@ -10,8 +11,13 @@ async function handlePATCH(request, { params }) {
       return Response.json({ message: "SEO not found" }, { status: 404 });
     }
 
-    seo.is_active = !seo.is_active;
+    // is_active is ENUM("active","inactive") — `!seo.is_active` stored `false`,
+    // which isn't a valid value, so the toggle never worked.
+    seo.is_active = seo.is_active === "active" ? "inactive" : "active";
     await seo.save();
+
+    // Statically generated pages read SEO at render time — refresh them.
+    revalidatePath("/", "layout");
 
     return Response.json({ message: "Status updated", data: seo });
   } catch (err) {

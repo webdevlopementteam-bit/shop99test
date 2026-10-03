@@ -58,14 +58,12 @@ function buildProductUrl(product) {
 
 // Category has a real `slug` field (backend generates it via slugify(name)),
 // so use that for cleaner URLs. Change to category.id if your route uses id instead.
+// The category's shop page, exactly as its canonical URL is written
+// (lib/buildPageMetadata.js). Old /category/<slug> links 308 here.
 function buildCategoryUrl(category) {
-  return `/category/${category.slug}`;
+  return `/shop?category=${encodeURIComponent(category.name)}`;
 }
 
-// Brand model has no slug field (only name/image), so id-based route.
-function buildBrandUrl(brand) {
-  return `/brand/${brand.id}`;
-}
 
 /* ================= FETCH HELPERS ================= */
 
@@ -130,10 +128,6 @@ async function fetchCategories() {
   return Array.isArray(json.categories) ? json.categories : extractList(json);
 }
 
-async function fetchBrands() {
-  const json = await safeFetchJson(`${API_BASE_URL}/api/brands`, "brands");
-  return extractList(json);
-}
 
 /* ================= XML BUILDING ================= */
 
@@ -196,17 +190,8 @@ async function generateSitemap() {
   });
 
   // Brands
-  const brands = await fetchBrands();
-  console.log(`🏷️  Brands fetched: ${brands.length}`);
-  brands.forEach((brand) => {
-    entries.push(
-      urlEntry(`${SITE_URL}${buildBrandUrl(brand)}`, {
-        changefreq: "daily",
-        priority: 0.6,
-        lastmod: today,
-      })
-    );
-  });
+  // Brands are not listed: /shop?brand=<id> canonicalises to /shop, and old
+  // /brand/<id> links 308-redirect there.
 
   // Products
   const products = await fetchAllProducts();
@@ -223,7 +208,7 @@ async function generateSitemap() {
 
   // Don't clobber a good sitemap with a static-pages-only one when the API
   // was unreachable/misconfigured.
-  if (categories.length + brands.length + products.length === 0) {
+  if (categories.length + products.length === 0) {
     console.warn(`⚠️  No dynamic URLs fetched — keeping existing ${OUTPUT_PATH}`);
     return;
   }
