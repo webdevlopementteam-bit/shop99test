@@ -12,6 +12,12 @@ if (missing.length) {
 const nextConfig = {
   serverExternalPackages: ["sequelize", "pdfkit"],
 
+  // Next streams generateMetadata() output into <body> for every UA not in its
+  // "HTML-limited bots" list — Googlebot included. Google ignores a
+  // rel="canonical" outside <head>, so match every UA to keep title, meta and
+  // canonical in <head> on the server-rendered HTML.
+  htmlLimitedBots: /.*/,
+
   // Resized/WebP copies served from /_next/image (see lib/imageUrl.js),
   // cached for 31 days so each size is generated once.
   images: {
