@@ -2,8 +2,6 @@
 
 import { useRef, useState, useEffect } from "react";
 import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 import { BASE_URL } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { getProductDisplayPricing } from "@/lib/productPricing";
@@ -112,7 +110,10 @@ const PopularProductsSlider = ({ popularProducts, toggleWishlist, wishlistIds, h
 
               {/* TITLE */}
 
-              <h3 className="font-semibold my-2 line-clamp-2 min-h-[48px]">{item.name}</h3>
+              {/* <p>, not a heading: react-slick copies slides (and this list renders
+                  in both the mobile and desktop slider), so a heading here repeated
+                  every product name 4 times in the page outline. */}
+              <p className="font-semibold my-2 line-clamp-2 min-h-[48px]">{item.name}</p>
 
               {/* PRICE */}
 

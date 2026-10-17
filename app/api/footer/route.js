@@ -1,28 +1,16 @@
 import { withAdmin } from "@/lib/auth.js";
 import Footer from "@/lib/models/footerModel.js";
 import { saveUploadedFile } from "@/lib/upload.js";
-
-const safeParse = (data) => {
-  try {
-    return typeof data === "string" ? JSON.parse(data) : data;
-  } catch {
-    return [];
-  }
-};
+import { getActiveFooter } from "@/lib/storefrontLists.js";
 
 /* ================= GET ================= */
 export async function GET() {
   try {
-    const footer = await Footer.findOne({ where: { is_active: true }, order: [["id", "DESC"]] });
+    const footer = await getActiveFooter();
 
     if (!footer) return Response.json({ message: "Not found" }, { status: 404 });
 
-    return Response.json({
-      ...footer.toJSON(),
-      columns: safeParse(footer.columns),
-      contact: safeParse(footer.contact),
-      socials: safeParse(footer.socials),
-    });
+    return Response.json(footer);
   } catch (err) {
     return Response.json({ message: err.message }, { status: 500 });
   }

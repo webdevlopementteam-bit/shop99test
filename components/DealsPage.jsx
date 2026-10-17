@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { BASE_URL, getDealsProductsApi, getWishlistApi, addToWishlistApi } from "@/lib/api";
+import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { BASE_URL, getDealsProductsApi, getWishlistApi, addToWishlistApi, normalizeDealsRows } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { toast } from "react-toastify";
@@ -16,14 +16,27 @@ const dealsBanner = "/assets/banner/banner-3.png";
 
 const PREVIEW_COUNT = 4;
 
+// Current time to the minute, for the deal countdowns. null while rendering on
+// the server (and hydrating), so the HTML never carries a countdown the
+// browser's clock would disagree with.
+const subscribeToMinutes = (onTick) => {
+  const timer = setInterval(onTick, 60 * 1000);
+  return () => clearInterval(timer);
+};
+const currentMinute = () => Math.floor(Date.now() / 60000) * 60000;
+const noTimeOnServer = () => null;
+
 export default function DealsPage({
   embedded = false,
+  // Raw GET /api/deals rows from the server, so the deals are in the HTML.
+  initialDeals = null,
   toggleWishlist: toggleWishlistProp,
   handleAddToCart: handleAddToCartProp,
   wishlistIds: wishlistIdsProp,
 }) {
-  const [offers, setOffers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [offers, setOffers] = useState(() => (Array.isArray(initialDeals) ? normalizeDealsRows(initialDeals) : []));
+  const [loading, setLoading] = useState(!initialDeals);
+  const now = useSyncExternalStore(subscribeToMinutes, currentMinute, noTimeOnServer);
   const router = useRouter();
   const { addToCart } = useCart();
   const [localWishlistIds, setLocalWishlistIds] = useState([]);
@@ -34,6 +47,7 @@ export default function DealsPage({
   const wishlistIds = useParentWishlist ? wishlistIdsProp ?? [] : localWishlistIds;
 
   useEffect(() => {
+    if (initialDeals) return;
     let ignore = false;
     const loadDeals = async () => {
       setLoading(true);
@@ -51,7 +65,7 @@ export default function DealsPage({
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [initialDeals]);
 
   useEffect(() => {
     if (useParentWishlist) return;
@@ -131,8 +145,8 @@ export default function DealsPage({
   const visibleOffers = useMemo(() => (embedded ? offers.slice(0, PREVIEW_COUNT) : offers), [embedded, offers]);
 
   const getTimeLeft = (endDate) => {
-    if (!endDate) return null;
-    const total = new Date(endDate) - new Date();
+    if (!endDate || now == null) return null;
+    const total = new Date(endDate) - now;
     if (total <= 0) return "Expired";
     const days = Math.floor(total / (1000 * 60 * 60 * 24));
     const hours = Math.floor((total / (1000 * 60 * 60)) % 24);

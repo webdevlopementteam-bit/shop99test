@@ -1,11 +1,11 @@
 import { withAdmin } from "@/lib/auth.js";
 import Brand from "@/lib/models/brandModel.js";
+import { listBrands } from "@/lib/storefrontLists.js";
 import { saveUploadedFile } from "@/lib/upload.js";
 
 export async function GET() {
   try {
-    const data = await Brand.findAll({ order: [["id", "DESC"]] });
-    return Response.json(data);
+    return Response.json(await listBrands());
   } catch (err) {
     console.error(err);
     return Response.json({ message: "Failed to fetch brands" }, { status: 500 });

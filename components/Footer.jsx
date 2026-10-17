@@ -12,9 +12,47 @@ import {
 import { toast } from "react-toastify";
 import { getUserToken } from "@/lib/authSession";
 import { optimizedSrc } from "@/lib/imageUrl";
+import { toSitePath } from "@/lib/siteConfig";
 
-export default function Footer() {
-  const [footer, setFooter] = useState(null);
+/** GET /api/footer → footer settings; columns/contact/socials arrive as JSON strings. */
+function parseFooter(data) {
+  let parsedColumns = [];
+  let parsedContact = {};
+  let parsedSocials = {};
+
+  try {
+    parsedColumns = typeof data.columns === "string" ? JSON.parse(data.columns) : data.columns || [];
+  } catch {
+    console.log("Error parsing footer columns:", data.columns);
+  }
+
+  try {
+    parsedContact = typeof data.contact === "string" ? JSON.parse(data.contact) : data.contact || {};
+  } catch {
+    console.log("Error parsing footer contact:", data.contact);
+  }
+
+  try {
+    parsedSocials = typeof data.socials === "string" ? JSON.parse(data.socials) : data.socials || {};
+  } catch {
+    console.log("Error parsing footer socials:", data.socials);
+  }
+
+  return {
+    ...data,
+    columns: parsedColumns,
+    contact: parsedContact,
+    socials: parsedSocials,
+  };
+}
+
+/**
+ * `initialFooter` (from the storefront layout, server-side) puts the footer —
+ * contact details included — in the HTML. It's still re-fetched on mount, so
+ * admin edits show even on pages pre-rendered before the edit.
+ */
+export default function Footer({ initialFooter = null }) {
+  const [footer, setFooter] = useState(() => (initialFooter ? parseFooter(initialFooter) : null));
   const [subscriberEmail, setSubscriberEmail] = useState("");
   const [submittingEmail, setSubmittingEmail] = useState(false);
 
@@ -25,35 +63,7 @@ export default function Footer() {
   const fetchFooter = async () => {
     const data = await getFooterApi();
     if (!data) return;
-
-    let parsedColumns = [];
-    let parsedContact = {};
-    let parsedSocials = {};
-
-    try {
-      parsedColumns = typeof data.columns === "string" ? JSON.parse(data.columns) : data.columns || [];
-    } catch {
-      console.log("Error parsing footer columns:", data.columns);
-    }
-
-    try {
-      parsedContact = typeof data.contact === "string" ? JSON.parse(data.contact) : data.contact || {};
-    } catch {
-      console.log("Error parsing footer contact:", data.contact);
-    }
-
-    try {
-      parsedSocials = typeof data.socials === "string" ? JSON.parse(data.socials) : data.socials || {};
-    } catch {
-      console.log("Error parsing footer socials:", data.socials);
-    }
-
-    setFooter({
-      ...data,
-      columns: parsedColumns,
-      contact: parsedContact,
-      socials: parsedSocials,
-    });
+    setFooter(parseFooter(data));
   };
 
   // ✅ loader
@@ -159,9 +169,12 @@ export default function Footer() {
               <img
                 src={optimizedSrc(`${IMAGE_URL}${footer.logo}`, 384)}
                 alt="Shop99"
+                // Proportions only — the admin can upload any logo; w-auto keeps its own ratio.
+                width={200}
+                height={100}
                 loading="lazy"
                 decoding="async"
-                className="h-14 mb-5 object-contain"
+                className="h-14 w-auto mb-5 object-contain"
               />
             </Link>
 
@@ -299,6 +312,12 @@ export default function Footer() {
             <span className="text-orange-500 font-semibold">SHOP99 | ALL RIGHTS RESERVED </span>
             <span className="text-orange-500 font-semibold">| POWERED BY SHOP99</span>
           </p>
+          {/* Static (not from the admin footer settings) so it's always in the
+              server HTML — search engines and AI crawlers use it to identify
+              the business. Keep in sync with the schema in app/layout.jsx. */}
+          <p className="mt-2 text-xs text-gray-300">
+            Shop99 is operated by Prakash Electronics (India), GT Karnal Road, Sidhoran Kalan, Delhi, India
+          </p>
         </div>
       </div>
     </footer>
@@ -314,7 +333,7 @@ function FooterColumn({ title, links }) {
       <ul className="space-y-3">
         {links?.map((link, index) => (
           <li key={index}>
-            <Link href={link.path} className="text-white hover:text-orange-500 transition">
+            <Link href={toSitePath(link.path)} className="text-white hover:text-orange-500 transition">
               {link.name}
             </Link>
           </li>

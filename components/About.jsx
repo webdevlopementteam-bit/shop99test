@@ -1,6 +1,10 @@
 import TestimonialSlider from "@/components/TestimonialSlider";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTruckFast, faHeart, faShieldHalved, faCircleCheck } from "@fortawesome/free-solid-svg-icons";
+// Sizes the SVG icons (.svg-inline--fa { height: 1em } …). This is a Server
+// Component, so Font Awesome's runtime CSS injection never runs — and the
+// site no longer loads the CDN stylesheet that used to cover it.
+import "@fortawesome/fontawesome-svg-core/styles.css";
 
 const wheel = "/assets/home/charger.png";
 const aboutimg = "/assets/banner/aboutimg.jpeg";

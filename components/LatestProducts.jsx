@@ -81,7 +81,8 @@ function renderRatingStars(average) {
 }
 
 export default function LatestProducts({ products: productsFromParent, setPreviewImage, toggleWishlist, wishlistIds = [] }) {
-  const [products, setProducts] = useState([]);
+  // Start from the parent's list so server-rendered HTML already has the products.
+  const [products, setProducts] = useState(() => (Array.isArray(productsFromParent) ? productsFromParent : []));
   const [activeTab, setActiveTab] = useState("All");
   const { addToCart } = useCart();
   const router = useRouter();

@@ -2,8 +2,6 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { getProductsApi, getCategoriesApi, getBrandsApi, getWishlistApi, addToWishlistApi, removeWishlistApi, BASE_URL } from "@/lib/api";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 import { useCart } from "@/context/CartContext";
 import { toast } from "react-toastify";
 import { useSearchParams, useRouter } from "next/navigation";

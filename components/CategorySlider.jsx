@@ -2,21 +2,21 @@
 
 import { useState, useEffect } from "react";
 import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 import { getTopCategoriesApi, BASE_URL } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { optimizedSrc } from "@/lib/imageUrl";
 import { useInertHiddenSlides } from "@/lib/slickA11y";
 
-const CategorySlider = () => {
+/** `initialCategories` from the server puts the categories in the HTML; without it they're fetched here. */
+const CategorySlider = ({ initialCategories = null }) => {
   const [slidesToShow, setSlidesToShow] = useState(5);
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState(() => (Array.isArray(initialCategories) ? initialCategories : []));
   const router = useRouter();
   const { wrapRef: sliderWrapRef, inertProps } = useInertHiddenSlides();
 
   // Load Categories
   useEffect(() => {
+    if (initialCategories) return;
     const loadTopCategories = async () => {
       try {
         const data = await getTopCategoriesApi();
@@ -27,7 +27,7 @@ const CategorySlider = () => {
     };
 
     loadTopCategories();
-  }, []);
+  }, [initialCategories]);
 
   // Handle Responsive Slides
   useEffect(() => {
@@ -92,13 +92,15 @@ const CategorySlider = () => {
                       />
                     ) : null}
 
-                    <h3
+                    {/* <p>, not a heading: react-slick copies slides, so a heading
+                        here repeated every category 3 times in the page outline. */}
+                    <p
                       className={`font-semibold ${
                         !item?.image || String(item.image).trim() === "" ? "text-lg py-4" : ""
                       }`}
                     >
                       {item.name}
-                    </h3>
+                    </p>
                   </div>
                 </div>
               ))

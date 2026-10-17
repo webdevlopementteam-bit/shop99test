@@ -1,0 +1,13 @@
+/* Third-party component CSS (plus hero.css, which overrides Swiper), bundled
+   into one stylesheet instead of one render-blocking file each. Same order
+   the separate imports used to load in, so nothing overrides differently.
+   Imported once, in app/(storefront)/layout.jsx — don't re-import these from
+   components (that splits them back into separate files). */
+@import "react-toastify/dist/ReactToastify.css";
+@import "slick-carousel/slick/slick.css";
+@import "slick-carousel/slick/slick-theme.css";
+@import "swiper/css";
+@import "swiper/css/pagination";
+@import "swiper/css/effect-fade";
+/* Homepage hero animation + Swiper arrow overrides — must stay after Swiper. */
+@import "./hero.css";

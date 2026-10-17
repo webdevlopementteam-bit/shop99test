@@ -3,8 +3,6 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
 import { UserRound } from "lucide-react";
-import "swiper/css";
-import "swiper/css/pagination";
 
 const testimonials = [
   {

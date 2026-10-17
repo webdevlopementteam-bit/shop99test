@@ -26,13 +26,36 @@ export const viewport = {
   initialScale: 1,
 };
 
+// ElectronicsStore is a LocalBusiness (and an Organization), so this one block
+// covers both. Name/address/phone must match the Google Business Profile and
+// the Contact page exactly — update all three together.
 const ORGANIZATION_SCHEMA = {
   "@context": "https://schema.org",
-  "@type": "Organization",
+  "@type": "ElectronicsStore",
+  "@id": `${SITE_URL}/#organization`,
   name: "Shop99",
-  alternateName: "Prakash Electronics (India)",
+  legalName: "Prakash Electronics (India)",
   url: SITE_URL,
   logo: `${SITE_URL}/favicon.png`,
+  image: `${SITE_URL}/favicon.png`,
+  telephone: "+91-8920114845",
+  email: "support@shop99.co.in",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress:
+      "Ground Floor, 804/24-26, 940/23, 939/23, GT Karnal Road, DDA Sangam Park Market, Sidhoran Kalan",
+    addressLocality: "Delhi",
+    addressRegion: "Delhi",
+    addressCountry: "IN",
+  },
+  areaServed: { "@type": "Country", name: "India" },
+  contactPoint: {
+    "@type": "ContactPoint",
+    contactType: "customer service",
+    telephone: "+91-8920114845",
+    email: "support@shop99.co.in",
+    areaServed: "IN",
+  },
 };
 
 export default function RootLayout({ children }) {
@@ -47,9 +70,7 @@ export default function RootLayout({ children }) {
           type="font/woff2"
           crossOrigin="anonymous"
         />
-        {/* Organization schema — site-wide identity, kept minimal/static so it
-            never drifts (no phone/address here since those are admin-editable
-            via the footer settings and could go stale). */}
+        {/* Site-wide business identity (LocalBusiness + Organization). */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(ORGANIZATION_SCHEMA) }}

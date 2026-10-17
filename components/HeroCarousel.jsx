@@ -6,11 +6,7 @@ import { Autoplay, Pagination, EffectFade } from "swiper/modules";
 import { getBannersApi } from "@/lib/api";
 import { heroBackground, heroProduct } from "@/lib/imageUrl";
 
-import "swiper/css";
-import "swiper/css/effect-fade";
-import "swiper/css/pagination";
-
-import "@/styles/hero.css";
+// Swiper's CSS and hero.css come from styles/vendor.css (storefront layout).
 
 import { useRouter } from "next/navigation";
 
@@ -76,7 +72,9 @@ const HeroCarousel = ({ initialBanners = null }) => {
                 {bg && (
                   <img
                     {...heroBackground(bg)}
-                    alt=""
+                    // Decorative (aria-hidden), but SEO audits count an empty
+                    // alt as missing.
+                    alt={`${banner.title} banner`}
                     aria-hidden="true"
                     loading={i === 0 ? "eager" : "lazy"}
                     fetchPriority={i === 0 ? "high" : "auto"}
@@ -91,9 +89,11 @@ const HeroCarousel = ({ initialBanners = null }) => {
                 <div className="hero-text relative z-10 max-w-xl w-full">
                   <span className="bg-orange-700 text-white px-4 py-1 rounded text-sm">New Brand</span>
 
-                  <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold mt-4 md:mt-6 leading-tight">
+                  {/* <p>, not <h2>: the slides sit above the page's <h1>, so a
+                      heading here made the outline start at H2. */}
+                  <p className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold mt-4 md:mt-6 leading-tight">
                     {banner.title}
-                  </h2>
+                  </p>
 
                   <p className="text-gray-600 mt-3 md:mt-4 text-sm sm:text-base max-w-lg">{banner.subtitle}</p>
 
@@ -137,6 +137,9 @@ const HeroCarousel = ({ initialBanners = null }) => {
                   <img
                     {...heroProduct(`/uploads/${banner.image}`)}
                     alt={banner.title}
+                    // Proportions only (reserves space before load); hero.css sets height:auto.
+                    width={650}
+                    height={650}
                     // First slide is above the fold (and preloaded) — load it now.
                     loading={i === 0 ? "eager" : "lazy"}
                     fetchPriority={i === 0 ? "high" : "auto"}

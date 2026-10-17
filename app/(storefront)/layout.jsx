@@ -1,13 +1,20 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { getActiveFooter } from "@/lib/storefrontLists";
 import { CartProvider } from "@/context/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
 import ToastProvider from "@/components/ToastProvider";
-import "react-toastify/dist/ReactToastify.css";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+// toastify, slick and swiper CSS — one file (see styles/vendor.css).
+import "@/styles/vendor.css";
 
-export default function StorefrontLayout({ children }) {
+export default async function StorefrontLayout({ children }) {
+  // Server-side so the footer's contact details are in the HTML; null → the
+  // Footer fetches it in the browser as before.
+  const footer = await getActiveFooter().catch((err) => {
+    console.error("Footer:", err);
+    return null;
+  });
+
   return (
     <div className="site-scope">
       <AuthProvider>
@@ -16,7 +23,7 @@ export default function StorefrontLayout({ children }) {
               jumps when it appears. Its useSearchParams() part has its own. */}
           <Header />
           <main>{children}</main>
-          <Footer />
+          <Footer initialFooter={footer} />
           <ToastProvider />
         </CartProvider>
       </AuthProvider>

@@ -18,6 +18,7 @@ import {
   getMostSellingProductsApi,
   addToWishlistApi,
   getWishlistApi,
+  normalizeCurationRows,
 } from "@/lib/api";
 
 import CategorySlider from "@/components/CategorySlider";
@@ -122,11 +123,15 @@ const resolveProductImage = (item) => {
   return `${BASE_URL}/uploads/${withoutLeadingSlash}`;
 };
 
-const Home = ({ initialBanners = null }) => {
-  const [brands, setBrands] = useState([]);
-  const [popularProducts, setPopularProducts] = useState([]);
-  const [mostSellingProducts, setMostSellingProducts] = useState([]);
-  const [latestProducts, setLatestProducts] = useState([]);
+// `initialLists` comes from the server (app/(storefront)/page.jsx) so the
+// products are in the HTML; a list that's null there is fetched here instead.
+const curated = (rows) => (Array.isArray(rows) ? normalizeCurationRows(rows) : []);
+
+const Home = ({ initialBanners = null, initialLists = {} }) => {
+  const [brands, setBrands] = useState(() => (Array.isArray(initialLists.brands) ? [...initialLists.brands].reverse() : []));
+  const [popularProducts, setPopularProducts] = useState(() => curated(initialLists.popular));
+  const [mostSellingProducts, setMostSellingProducts] = useState(() => curated(initialLists.mostSelling));
+  const [latestProducts, setLatestProducts] = useState(() => curated(initialLists.latest));
   const router = useRouter();
   const { addToCart } = useCart();
   const [wishlistIds, setWishlistIds] = useState([]);
@@ -161,17 +166,19 @@ const Home = ({ initialBanners = null }) => {
   ];
 
   useEffect(() => {
+    if (initialLists.brands) return;
     const load = async () => {
       const b = await getBrandsApi();
       setBrands(Array.isArray(b) ? [...b].reverse() : []);
     };
 
     load();
-  }, []);
+  }, [initialLists.brands]);
 
   useEffect(() => {
+    if (initialLists.popular) return;
     fetchPopular();
-  }, []);
+  }, [initialLists.popular]);
 
   const fetchPopular = async () => {
     try {
@@ -233,6 +240,7 @@ const Home = ({ initialBanners = null }) => {
   };
 
   useEffect(() => {
+    if (initialLists.latest) return;
     const loadLatestProducts = async () => {
       try {
         const data = await getLatestProductsApi();
@@ -244,9 +252,10 @@ const Home = ({ initialBanners = null }) => {
     };
 
     loadLatestProducts();
-  }, []);
+  }, [initialLists.latest]);
 
   useEffect(() => {
+    if (initialLists.mostSelling) return;
     const loadMostSellingProducts = async () => {
       try {
         const data = await getMostSellingProductsApi();
@@ -258,7 +267,7 @@ const Home = ({ initialBanners = null }) => {
     };
 
     loadMostSellingProducts();
-  }, []);
+  }, [initialLists.mostSelling]);
 
   const handleAddToCart = (item) => {
     const imageUrl = resolveProductImage(item);
@@ -288,7 +297,7 @@ const Home = ({ initialBanners = null }) => {
         Buy Car Accessories Online in India
       </h1>
 
-      <CategorySlider />
+      <CategorySlider initialCategories={initialLists.topCategories} />
       {/* =================  shop section start (today popular pick) ================= */}
 
       <PopularProductsSlider
@@ -344,7 +353,7 @@ const Home = ({ initialBanners = null }) => {
 
       {/* ================= DEALS OF THE WEEK ================= */}
 
-      <DealsPage embedded toggleWishlist={toggleWishlist} handleAddToCart={handleAddToCart} wishlistIds={wishlistIds} />
+      <DealsPage embedded initialDeals={initialLists.deals} toggleWishlist={toggleWishlist} handleAddToCart={handleAddToCart} wishlistIds={wishlistIds} />
 
       {/* ================= SHOP BY BRAND ================= */}
 
@@ -514,12 +523,20 @@ const Home = ({ initialBanners = null }) => {
       <section className="mt-20 px-4 sm:px-8 lg:px-24">
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-0 border rounded-2xl overflow-hidden bg-white">
           {/* ================= LEFT ADS CARD ================= */}
-          <div
-            className="relative flex flex-col justify-between text-center rounded-l-2xl overflow-hidden bg-cover bg-center p-8"
-            style={{
-              backgroundImage: `url(${optimizedSrc(ads1, 828)})`,
-            }}
-          >
+          <div className="relative flex flex-col justify-between text-center rounded-l-2xl overflow-hidden p-8">
+            {/* An <img>, not an inline background-image style: same look,
+                but responsive sizes and no inline style in the HTML. */}
+            <img
+              {...responsiveImage(ads1, { sizes: "(min-width: 1024px) 20vw, 100vw", maxWidth: 828 })}
+              alt="Car audio products"
+              aria-hidden="true"
+              width={828}
+              height={828}
+              loading="lazy"
+              decoding="async"
+              className="absolute inset-0 h-full w-full object-cover object-center"
+            />
+
             {/* Dark overlay for readability */}
             <div className="absolute inset-0 bg-black/50"></div>
 
