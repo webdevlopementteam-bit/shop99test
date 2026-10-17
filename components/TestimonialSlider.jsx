@@ -80,7 +80,7 @@ const TestimonialSlider = () => {
                   </div>
 
                   <div>
-                    <h4 className="font-semibold">{item.name}</h4>
+                    <h3 className="font-semibold">{item.name}</h3>
                     <p className="text-sm text-gray-500">{item.role}</p>
                   </div>
                 </div>

@@ -89,7 +89,7 @@ const HeroCarousel = ({ initialBanners = null }) => {
 
                 {/* TEXT */}
                 <div className="hero-text relative z-10 max-w-xl w-full">
-                  <span className="bg-orange-500 text-white px-4 py-1 rounded text-sm">New Brand</span>
+                  <span className="bg-orange-700 text-white px-4 py-1 rounded text-sm">New Brand</span>
 
                   <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold mt-4 md:mt-6 leading-tight">
                     {banner.title}

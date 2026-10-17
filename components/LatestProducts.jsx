@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import { countProductVariantsInPayload } from "@/lib/productVariants";
 import { getProductCategoryLabel } from "@/lib/productCategory";
 import { getProductDisplayPricing } from "@/lib/productPricing";
+import { optimizedSrc } from "@/lib/imageUrl";
 
 function getResolvedProductImage(item) {
   const raw = item?.image ?? item?.Product?.image ?? item?.product?.image ?? item?.thumbnail ?? "";
@@ -150,7 +151,7 @@ export default function LatestProducts({ products: productsFromParent, setPrevie
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`pb-1 border-b-2 transition ${
-                activeTab === tab ? "border-orange-500 text-orange-500" : "border-transparent text-gray-600 hover:text-orange-500"
+                activeTab === tab ? "border-orange-700 text-orange-700" : "border-transparent text-gray-600 hover:text-orange-700"
               }`}
             >
               {tab}
@@ -184,7 +185,7 @@ export default function LatestProducts({ products: productsFromParent, setPrevie
                 {badge && (
                   <span
                     className={`absolute top-0 left-0 text-xs px-3 py-1 rounded text-white z-10 ${
-                      badge === "Sale" ? "bg-red-500" : badge === "New" ? "bg-green-500" : "bg-orange-500"
+                      badge === "Sale" ? "bg-red-600" : badge === "New" ? "bg-green-700" : "bg-orange-700"
                     }`}
                   >
                     {badge}
@@ -192,8 +193,13 @@ export default function LatestProducts({ products: productsFromParent, setPrevie
                 )}
 
                 <img
-                  src={imageUrl}
+                  // ~128px tall: a 384px WebP covers high-DPR phones.
+                  src={optimizedSrc(imageUrl, 384)}
                   alt={item.name}
+                  width={384}
+                  height={384}
+                  loading="lazy"
+                  decoding="async"
                   className="h-32 sm:h-28 w-full object-contain transition-all duration-500 group-hover:opacity-30"
                   onError={(e) => {
                     // Fallback once — never loop if the placeholder itself fails.
@@ -209,6 +215,7 @@ export default function LatestProducts({ products: productsFromParent, setPrevie
                 >
                   {/* PREVIEW */}
                   <button
+                    aria-label="Preview image"
                     className="w-9 h-9 bg-white rounded-full shadow flex items-center justify-center hover:bg-orange-500 hover:text-white"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -222,6 +229,7 @@ export default function LatestProducts({ products: productsFromParent, setPrevie
 
                   {/* WISHLIST */}
                   <button
+                    aria-label="Wishlist"
                     className="w-9 h-9 bg-white rounded-full shadow flex items-center justify-center hover:bg-orange-500 hover:text-white"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -239,7 +247,7 @@ export default function LatestProducts({ products: productsFromParent, setPrevie
 
               {/* CONTENT */}
               <div className="flex-1 min-w-0 flex flex-col">
-                <h4 className="font-semibold text-sm leading-snug line-clamp-2 min-h-[40px]">{item.name}</h4>
+                <h3 className="font-semibold text-sm leading-snug line-clamp-2 min-h-[40px]">{item.name}</h3>
 
                 <div
                   className="flex items-center gap-1 text-sm mt-2"
@@ -253,13 +261,13 @@ export default function LatestProducts({ products: productsFromParent, setPrevie
 
                 <div className="mt-2 min-h-[28px] flex flex-wrap items-baseline gap-x-2 gap-y-1">
                   {pricing.hasDiscount && pricing.oldPrice != null && (
-                    <span className="text-sm text-gray-400 line-through whitespace-nowrap">
+                    <span className="text-sm text-gray-500 line-through whitespace-nowrap">
                       ₹{formatPrice(pricing.oldPrice)}
                     </span>
                   )}
-                  <span className="text-red-500 font-bold whitespace-nowrap">₹{formatPrice(pricing.finalPrice)}</span>
+                  <span className="text-red-600 font-bold whitespace-nowrap">₹{formatPrice(pricing.finalPrice)}</span>
                   {pricing.hasDiscount && pricing.discountPercent > 0 && (
-                    <span className="text-xs font-medium text-green-600 whitespace-nowrap">
+                    <span className="text-xs font-medium text-green-700 whitespace-nowrap">
                       {Math.round(pricing.discountPercent)}% OFF
                     </span>
                   )}

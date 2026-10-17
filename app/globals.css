@@ -4,7 +4,11 @@
 
 @font-face {
   font-family: 'inter';
-  src: url('/fonts/Inter_18pt-SemiBold.ttf') format('truetype');
+  /* Latin + ₹ subset of the TTF (31 KB vs 343 KB); preloaded in app/layout.jsx. */
+  src: url('/fonts/Inter_18pt-SemiBold-latin.woff2') format('woff2'),
+    url('/fonts/Inter_18pt-SemiBold.ttf') format('truetype');
+  /* Show text in the fallback font while this loads, not invisible text. */
+  font-display: swap;
 }
 
 /* Storefront-only reset — scoped to .site-scope so it doesn't leak into the

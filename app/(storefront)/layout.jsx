@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { CartProvider } from "@/context/CartContext";
@@ -13,10 +12,10 @@ export default function StorefrontLayout({ children }) {
     <div className="site-scope">
       <AuthProvider>
         <CartProvider>
-          <Suspense fallback={null}>
-            <Header />
-          </Suspense>
-          {children}
+          {/* No <Suspense> here: Header renders with the page, so nothing
+              jumps when it appears. Its useSearchParams() part has its own. */}
+          <Header />
+          <main>{children}</main>
           <Footer />
           <ToastProvider />
         </CartProvider>

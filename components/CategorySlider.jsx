@@ -6,11 +6,14 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { getTopCategoriesApi, BASE_URL } from "@/lib/api";
 import { useRouter } from "next/navigation";
+import { optimizedSrc } from "@/lib/imageUrl";
+import { useInertHiddenSlides } from "@/lib/slickA11y";
 
 const CategorySlider = () => {
   const [slidesToShow, setSlidesToShow] = useState(5);
   const [categories, setCategories] = useState([]);
   const router = useRouter();
+  const { wrapRef: sliderWrapRef, inertProps } = useInertHiddenSlides();
 
   // Load Categories
   useEffect(() => {
@@ -63,40 +66,47 @@ const CategorySlider = () => {
       <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8 w-full">
         <h2 className="text-2xl font-semibold mb-8">Popular Categories</h2>
 
-        <Slider {...settings}>
-          {categories.length > 0 ? (
-            categories.map((item) => (
-              <div
-                key={item.id}
-                className="px-3 cursor-pointer"
-                onClick={() => router.push(`/shop?category=${item.name}`)}
-              >
-                <div className="bg-white rounded-xl shadow p-5 text-center hover:shadow-lg transition-all min-h-[200px] flex flex-col items-center justify-center">
-                  {item?.image && String(item.image).trim() !== "" ? (
-                    <img
-                      src={`${BASE_URL}/uploads/${item.image}`}
-                      alt={item?.name || "Category"}
-                      className="h-32 mx-auto mb-4 object-contain"
-                      onError={(e) => {
-                        e.currentTarget.style.display = "none";
-                      }}
-                    />
-                  ) : null}
+        <div ref={sliderWrapRef}>
+          <Slider {...settings} {...inertProps}>
+            {categories.length > 0 ? (
+              categories.map((item) => (
+                <div
+                  key={item.id}
+                  className="px-3 cursor-pointer"
+                  onClick={() => router.push(`/shop?category=${item.name}`)}
+                >
+                  <div className="bg-white rounded-xl shadow p-5 text-center hover:shadow-lg transition-all min-h-[200px] flex flex-col items-center justify-center">
+                    {item?.image && String(item.image).trim() !== "" ? (
+                      <img
+                        // ~128px tall: a 384px WebP covers high-DPR phones.
+                        src={optimizedSrc(`${BASE_URL}/uploads/${item.image}`, 384)}
+                        alt={item?.name || "Category"}
+                        width={384}
+                        height={384}
+                        loading="lazy"
+                        decoding="async"
+                        className="h-32 w-auto mx-auto mb-4 object-contain"
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                        }}
+                      />
+                    ) : null}
 
-                  <h4
-                    className={`font-semibold ${
-                      !item?.image || String(item.image).trim() === "" ? "text-lg py-4" : ""
-                    }`}
-                  >
-                    {item.name}
-                  </h4>
+                    <h3
+                      className={`font-semibold ${
+                        !item?.image || String(item.image).trim() === "" ? "text-lg py-4" : ""
+                      }`}
+                    >
+                      {item.name}
+                    </h3>
+                  </div>
                 </div>
-              </div>
-            ))
-          ) : (
-            <div className="text-center w-full py-10">No Top Categories Found</div>
-          )}
-        </Slider>
+              ))
+            ) : (
+              <div className="text-center w-full py-10">No Top Categories Found</div>
+            )}
+          </Slider>
+        </div>
       </div>
     </section>
   );

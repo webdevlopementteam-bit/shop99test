@@ -483,20 +483,20 @@ function ProductCard({ item }) {
       </div>
 
       {/* CATEGORY */}
-      <p className="text-xs text-gray-400">{item.category}</p>
+      <p className="text-xs text-gray-500">{item.category}</p>
 
       {/* TITLE */}
       <h3 className="text-sm font-medium mb-2 line-clamp-2">{item.name}</h3>
 
       {/* PRICE */}
       <div className="flex gap-2 items-center">
-        <span className="text-red-500 font-semibold">₹{Number(item.price).toFixed(2)}</span>
+        <span className="text-red-600 font-semibold">₹{Number(item.price).toFixed(2)}</span>
 
-        {item.old_price && <span className="line-through text-gray-400 text-sm">₹{Number(item.old_price).toFixed(2)}</span>}
+        {item.old_price && <span className="line-through text-gray-500 text-sm">₹{Number(item.old_price).toFixed(2)}</span>}
       </div>
 
       {/* STOCK */}
-      <p className={`text-xs mt-2 ${item.in_stock ? "text-green-600" : "text-red-500"}`}>{item.in_stock ? "In Stock" : "Out of Stock"}</p>
+      <p className={`text-xs mt-2 ${item.in_stock ? "text-green-700" : "text-red-600"}`}>{item.in_stock ? "In Stock" : "Out of Stock"}</p>
 
       {/* BUTTON */}
       {item.in_stock ? (

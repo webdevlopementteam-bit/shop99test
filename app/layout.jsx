@@ -1,5 +1,8 @@
 import Script from "next/script";
 import "./globals.css";
+// Self-hosted, trimmed Font Awesome — the CDN stylesheet was render-blocking
+// and ~98% unused.
+import "@/styles/fontawesome.css";
 import { SITE_URL } from "@/lib/siteConfig";
 
 export const metadata = {
@@ -36,12 +39,13 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
+        {/* Body font — fetched with the HTML instead of after the CSS. */}
         <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
-          integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+          rel="preload"
+          href="/fonts/Inter_18pt-SemiBold-latin.woff2"
+          as="font"
+          type="font/woff2"
           crossOrigin="anonymous"
-          referrerPolicy="no-referrer"
         />
         {/* Organization schema — site-wide identity, kept minimal/static so it
             never drifts (no phone/address here since those are admin-editable

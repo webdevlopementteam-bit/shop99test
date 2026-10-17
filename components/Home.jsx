@@ -25,7 +25,7 @@ import { countProductVariantsInPayload } from "@/lib/productVariants";
 import { getProductCategoryLabel } from "@/lib/productCategory";
 import { getProductDisplayPricing } from "@/lib/productPricing";
 import { getUserToken } from "@/lib/authSession";
-import { responsiveImage } from "@/lib/imageUrl";
+import { optimizedSrc, responsiveImage } from "@/lib/imageUrl";
 
 const wheel = "/assets/products/sound-fire.jpeg";
 const ads1 = "/assets/home/ads-1.jpg";
@@ -481,11 +481,15 @@ const Home = ({ initialBanners = null }) => {
                   >
                     {brand.image ? (
                       <img
-                        src={`${BASE_URL}/uploads/${brand.image}`}
+                        src={optimizedSrc(`${BASE_URL}/uploads/${brand.image}`, 384)}
                         alt={brand.name}
+                        width={384}
+                        height={384}
+                        loading="lazy"
+                        decoding="async"
                         className="
-              max-h-full
-              max-w-full
+              h-full
+              w-full
               object-contain
               transition-transform duration-300
               group-hover:scale-110
@@ -513,7 +517,7 @@ const Home = ({ initialBanners = null }) => {
           <div
             className="relative flex flex-col justify-between text-center rounded-l-2xl overflow-hidden bg-cover bg-center p-8"
             style={{
-              backgroundImage: `url(${ads1})`,
+              backgroundImage: `url(${optimizedSrc(ads1, 828)})`,
             }}
           >
             {/* Dark overlay for readability */}
@@ -529,7 +533,7 @@ const Home = ({ initialBanners = null }) => {
 
               <button
                 onClick={() => router.push("/most-selling-products")}
-                className="bg-orange-500 px-6 py-3 rounded-lgfont-semibold transition hover:bg-whitehover:text-orange-500"
+                className="bg-orange-700 px-6 py-3 rounded-lg font-semibold text-white transition hover:bg-white hover:text-orange-700"
               >
                 View Products
               </button>
@@ -565,9 +569,14 @@ const Home = ({ initialBanners = null }) => {
                         <div className="relative">
                           {/* IMAGE */}
                           <img
-                            src={imageUrl}
+                            // ~144px tall: a 384px WebP covers high-DPR phones.
+                            src={optimizedSrc(imageUrl, 384)}
                             alt={item?.name || "Product"}
-                            className="h-36 mx-auto object-contain transition duration-300 group-hover:opacity-30"
+                            width={384}
+                            height={384}
+                            loading="lazy"
+                            decoding="async"
+                            className="h-36 w-auto mx-auto object-contain transition duration-300 group-hover:opacity-30"
                             onError={(e) => {
                               // Fallback once — never loop if the placeholder itself fails.
                               if (!e.target.src.endsWith("/no-image.png")) e.target.src = "/no-image.png";
@@ -592,6 +601,7 @@ const Home = ({ initialBanners = null }) => {
                           >
                             {/* PREVIEW */}
                             <button
+                              aria-label="Preview image"
                               className="w-9 h-9 bg-white rounded-full shadow flex items-center justify-center hover:bg-orange-500 hover:text-white"
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -603,6 +613,7 @@ const Home = ({ initialBanners = null }) => {
 
                             {/* WISHLIST */}
                             <button
+                              aria-label="Wishlist"
                               className="w-9 h-9 bg-white rounded-full shadow flex items-center justify-center hover:bg-orange-500 hover:text-white"
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -620,16 +631,16 @@ const Home = ({ initialBanners = null }) => {
                         <p className="text-gray-500 text-sm mt-4">{getProductCategoryLabel(item) || "—"}</p>
 
                         {/* TITLE */}
-                        <h4 className="font-semibold my-2 text-sm line-clamp-2">{item.name}</h4>
+                        <h3 className="font-semibold my-2 text-sm line-clamp-2">{item.name}</h3>
 
                         {/* PRICE */}
                         <p className="mb-2 flex flex-wrap items-center gap-2">
                           {pricing.hasDiscount && pricing.oldPrice != null && (
-                            <del className="text-gray-400 mr-2">₹{pricing.oldPrice.toFixed(2)}</del>
+                            <del className="text-gray-500 mr-2">₹{pricing.oldPrice.toFixed(2)}</del>
                           )}
-                          <span className="text-red-500 font-bold">₹{pricing.finalPrice.toFixed(2)}</span>
+                          <span className="text-red-600 font-bold">₹{pricing.finalPrice.toFixed(2)}</span>
                           {pricing.hasDiscount && pricing.discountPercent > 0 && (
-                            <span className="text-xs font-medium text-green-600">{pricing.discountPercent}% OFF</span>
+                            <span className="text-xs font-medium text-green-700">{pricing.discountPercent}% OFF</span>
                           )}
                         </p>
                       </div>
@@ -648,7 +659,7 @@ const Home = ({ initialBanners = null }) => {
       <LatestProducts products={latestProducts} setPreviewImage={setPreviewImage} toggleWishlist={toggleWishlist} wishlistIds={wishlistIds} />
 
       {/* ======== Highlight section ============ */}
-      <section className="bg-orange-500 py-8 mt-24">
+      <section className="bg-orange-700 py-8 mt-24">
         <div className="px-4 sm:px-8 lg:px-24 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {highlights.map((item) => (
             <div key={item.id} className="flex items-center gap-4 group">
@@ -662,7 +673,7 @@ const Home = ({ initialBanners = null }) => {
                 text-white text-xl
                 transition
                 group-hover:bg-white
-                group-hover:text-orange-500
+                group-hover:text-orange-700
               "
               >
                 <i className={item.icon}></i>

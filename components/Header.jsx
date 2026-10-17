@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useLayoutEffect, useRef, useMemo } from "react";
+import { Suspense, useState, useEffect, useLayoutEffect, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -17,8 +17,10 @@ import {
 } from "@/lib/productVariants";
 import { toast } from "react-toastify";
 import { getUserToken, clearUserSession, USER_SESSION_EXPIRED_EVENT } from "@/lib/authSession";
+import { optimizedSrc } from "@/lib/imageUrl";
 
-const logo = "/assets/home/logo.jpg";
+// Through the image optimizer: WebP, and cached 31 days instead of 7.
+const logo = optimizedSrc("/assets/home/logo.jpg", 256);
 
 const catMenuShellClass =
   "relative overflow-visible rounded-2xl border border-gray-200/70 bg-white shadow-[0_10px_44px_-8px_rgba(0,0,0,0.11),0_2px_8px_-2px_rgba(255,107,0,0.06)] ring-1 ring-orange-100/50";
@@ -300,6 +302,7 @@ function CategorySubmenuRow({
           onClick={toggleOpen}
           className="inline-flex min-h-[40px] min-w-[42px] shrink-0 items-center justify-center rounded-r-lg bg-transparent text-gray-400/90 transition-colors group-hover:bg-orange-50/90 group-hover:text-orange-600"
           aria-expanded={open}
+          aria-label={`${node.name} subcategories`}
         >
           <i
             className={`fa-solid ${
@@ -581,6 +584,7 @@ function AllCategoriesFlyout({ roots, onNavigate }) {
                     onClick={toggleRoot}
                     className="inline-flex min-h-[44px] min-w-[42px] shrink-0 items-center justify-center rounded-r-lg bg-transparent text-gray-400/90 transition-colors group-hover:bg-orange-50/90 group-hover:text-orange-600"
                     aria-expanded={isOpen}
+                    aria-label={`${node.name} subcategories`}
                   >
                     <i
                       className={`fa-solid ${
@@ -866,10 +870,24 @@ function MobileMegaMenuList({ nodes, topCatName, onPick, depth = 0 }) {
   );
 }
 
+/**
+ * Mirrors ?search= into the search box. Kept in its own component (inside its
+ * own <Suspense>) because useSearchParams() makes Next skip server rendering
+ * up to the nearest Suspense boundary on static pages — called in Header
+ * itself, it left the whole header out of the HTML and the page jumped down
+ * when it appeared (layout shift).
+ */
+function SearchParamSync({ onChange }) {
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    onChange(searchParams.get("search") || "");
+  }, [searchParams, onChange]);
+  return null;
+}
+
 const Header = () => {
   const { cart } = useCart();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const isDesktop = useIsDesktop();
   const searchDebounceRef = useRef(null);
 
@@ -945,10 +963,6 @@ const Header = () => {
   };
 
   useEffect(() => () => clearMegaHoverTimer(), []);
-
-  useEffect(() => {
-    setSearchText(searchParams.get("search") || "");
-  }, [searchParams]);
 
   useEffect(() => {
     if (!catalogWanted) return;
@@ -1408,6 +1422,9 @@ const Header = () => {
 
   return (
     <div className="relative isolate z-[200]">
+      <Suspense fallback={null}>
+        <SearchParamSync onChange={setSearchText} />
+      </Suspense>
       <div className="overflow-visible bg-white">
         <div className="px-3 py-3 sm:px-4 sm:py-4 md:px-8 lg:px-side">
           <div className="space-y-3 md:hidden">
@@ -1415,6 +1432,8 @@ const Header = () => {
               <Link href="/" className="min-w-0 shrink">
                 <img
                   src={logo}
+                  width={200}
+                  height={100}
                   className="h-auto w-[5.5rem] max-w-[40vw] object-contain sm:w-24"
                   alt="logo"
                 />
@@ -1422,7 +1441,7 @@ const Header = () => {
 
               <div className="flex shrink-0 touch-manipulation items-center gap-3 text-lg text-[#FF6B00] min-[380px]:gap-4 min-[380px]:text-xl">
                 <div className="relative">
-                  <Link href="/wishlist" onClick={closeAllDropdowns}>
+                  <Link href="/wishlist" onClick={closeAllDropdowns} aria-label="Wishlist">
                     <i className="fa-regular fa-heart" />
 
                     {wishlistCount > 0 && (
@@ -1434,7 +1453,7 @@ const Header = () => {
                 </div>
 
                 <div className="relative">
-                  <Link href="/cart" onClick={closeAllDropdowns}>
+                  <Link href="/cart" onClick={closeAllDropdowns} aria-label="Cart">
                     <i className="fa-solid fa-bag-shopping" />
 
                     {cartCount > 0 && (
@@ -1455,6 +1474,7 @@ const Header = () => {
                     className="bg-transparent p-0 text-inherit"
                     aria-expanded={accountOpen}
                     aria-haspopup="menu"
+                    aria-label="My account"
                   >
                     <i className="fa-regular fa-user cursor-pointer" />
                   </button>
@@ -1523,6 +1543,7 @@ const Header = () => {
                 <input
                   type="text"
                   placeholder="Search products..."
+                  aria-label="Search products"
                   value={searchText}
                   onChange={(e) => {
                     setSearchText(e.target.value);
@@ -1540,6 +1561,7 @@ const Header = () => {
                     if (e.key === "Enter") handleSearch();
                   }}
                   autoComplete="off"
+                  role="combobox"
                   aria-autocomplete="list"
                   aria-expanded={
                     showSearchSuggestions &&
@@ -1551,6 +1573,7 @@ const Header = () => {
                 <button
                   type="button"
                   onClick={handleSearch}
+                  aria-label="Search"
                   className="flex h-full w-12 shrink-0 items-center justify-center bg-orange-500 text-white"
                 >
                   <i className="fa-solid fa-magnifying-glass" />
@@ -1565,6 +1588,8 @@ const Header = () => {
             <Link href="/" className="shrink-0" onClick={closeAllDropdowns}>
               <img
                 src={logo}
+                width={200}
+                height={100}
                 className="h-auto w-24 max-w-[min(8rem,28vw)] object-contain md:w-28 lg:w-32"
                 alt="logo"
               />
@@ -1575,6 +1600,7 @@ const Header = () => {
                 <input
                   value={searchText}
                   placeholder="Search products or categories..."
+                  aria-label="Search products or categories"
                   onChange={(e) => {
                     setSearchText(e.target.value);
                     setShowSearchSuggestions(true);
@@ -1591,6 +1617,7 @@ const Header = () => {
                     if (e.key === "Enter") handleSearch();
                   }}
                   autoComplete="off"
+                  role="combobox"
                   aria-autocomplete="list"
                   aria-expanded={
                     showSearchSuggestions &&
@@ -1602,6 +1629,7 @@ const Header = () => {
                 <button
                   type="button"
                   onClick={handleSearch}
+                  aria-label="Search"
                   className="flex h-full w-12 shrink-0 items-center justify-center bg-orange-500 text-white hover:bg-orange-600 sm:w-14"
                 >
                   <i className="fa-solid fa-magnifying-glass" />
@@ -1613,7 +1641,7 @@ const Header = () => {
 
             <div className="flex shrink-0 items-center gap-3 text-lg md:gap-5 md:text-xl lg:gap-7">
               <div className="relative">
-                <Link href="/wishlist" onClick={closeAllDropdowns}>
+                <Link href="/wishlist" onClick={closeAllDropdowns} aria-label="Wishlist">
                   <i className="fa-regular fa-heart text-[#FF6B00] hover:text-[#153979]" />
 
                   {wishlistCount > 0 && (
@@ -1625,7 +1653,7 @@ const Header = () => {
               </div>
 
               <div className="relative">
-                <Link href="/cart" onClick={closeAllDropdowns}>
+                <Link href="/cart" onClick={closeAllDropdowns} aria-label="Cart">
                   <i className="fa-solid fa-bag-shopping text-[#FF6B00] hover:text-[#153979]" />
 
                   {cartCount > 0 && (
@@ -1800,6 +1828,7 @@ const Header = () => {
               className="inline-flex h-11 min-h-[44px] cursor-pointer items-center justify-center gap-2 rounded-md border border-orange-500 bg-white px-3.5 text-sm font-medium transition hover:bg-orange-50 md:gap-3 md:px-5 md:text-base"
               aria-expanded={accountOpen}
               aria-haspopup="menu"
+              aria-label="My account"
             >
               <i className="fa-regular fa-user" />
               <span className="hidden sm:inline">My Account</span>

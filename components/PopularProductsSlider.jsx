@@ -9,12 +9,15 @@ import { useRouter } from "next/navigation";
 import { getProductDisplayPricing } from "@/lib/productPricing";
 import { setNavState } from "@/lib/navState";
 import { optimizedSrc, responsiveImage } from "@/lib/imageUrl";
+import { useInertHiddenSlides } from "@/lib/slickA11y";
 
 const popularDesktop = "/assets/home/popular-picks.jpeg";
 const popularMobile = "/assets/home/popularpick-mobile.jpeg";
 
 const PopularProductsSlider = ({ popularProducts, toggleWishlist, wishlistIds, handleAddToCart, setPreviewImage }) => {
   const sliderRef = useRef(null);
+  const { wrapRef: mobileWrapRef, inertProps: mobileInertProps } = useInertHiddenSlides();
+  const { wrapRef: desktopWrapRef, inertProps: desktopInertProps } = useInertHiddenSlides();
   const router = useRouter();
 
   const [slidesToShow, setSlidesToShow] = useState(4);
@@ -63,11 +66,13 @@ const PopularProductsSlider = ({ popularProducts, toggleWishlist, wishlistIds, h
 
               <div className="relative">
                 <img
-                  src={item?.image ? optimizedSrc(`${BASE_URL}/uploads/${item.image}`, 640) : "/no-image.png"}
+                  src={item?.image ? optimizedSrc(`${BASE_URL}/uploads/${item.image}`, 384) : "/no-image.png"}
                   alt={item?.name || "Product"}
+                  width={384}
+                  height={384}
                   loading="lazy"
                   decoding="async"
-                  className="h-44 mx-auto object-contain transition duration-300 group-hover:opacity-30"
+                  className="h-44 w-auto mx-auto object-contain transition duration-300 group-hover:opacity-30"
                   onError={(e) => {
                     // Fallback once — never loop if the placeholder itself fails.
                     if (!e.target.src.endsWith("/no-image.png")) e.target.src = "/no-image.png";
@@ -78,6 +83,7 @@ const PopularProductsSlider = ({ popularProducts, toggleWishlist, wishlistIds, h
 
                 <div className="absolute left-1/2 -translate-x-1/2 bottom-6 flex gap-3 opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0 transition duration-300">
                   <button
+                    aria-label="Preview image"
                     className="w-9 h-9 bg-white rounded-full shadow flex items-center justify-center hover:bg-orange-500 hover:text-white"
                     onClick={(e) => {
                       e.stopPropagation(); // ✅ ADD THIS
@@ -88,6 +94,7 @@ const PopularProductsSlider = ({ popularProducts, toggleWishlist, wishlistIds, h
                   </button>
 
                   <button
+                    aria-label="Wishlist"
                     className="w-9 h-9 bg-white rounded-full shadow flex items-center justify-center hover:bg-orange-500 hover:text-white"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -105,26 +112,26 @@ const PopularProductsSlider = ({ popularProducts, toggleWishlist, wishlistIds, h
 
               {/* TITLE */}
 
-              <h4 className="font-semibold my-2 line-clamp-2 min-h-[48px]">{item.name}</h4>
+              <h3 className="font-semibold my-2 line-clamp-2 min-h-[48px]">{item.name}</h3>
 
               {/* PRICE */}
 
               <div className="flex items-center gap-2 mb-2">
                 {pricing.hasDiscount && pricing.oldPrice != null && (
-                  <span className="line-through text-gray-400 text-sm">₹{pricing.oldPrice.toFixed(2)}</span>
+                  <span className="line-through text-gray-500 text-sm">₹{pricing.oldPrice.toFixed(2)}</span>
                 )}
 
-                <span className="text-red-500 font-bold">₹{pricing.finalPrice.toFixed(2)}</span>
+                <span className="text-red-600 font-bold">₹{pricing.finalPrice.toFixed(2)}</span>
 
                 {pricing.hasDiscount && pricing.discountPercent > 0 && (
-                  <span className="text-xs font-medium text-green-600">{pricing.discountPercent}% OFF</span>
+                  <span className="text-xs font-medium text-green-700">{pricing.discountPercent}% OFF</span>
                 )}
               </div>
 
               {/* STOCK */}
 
               <div className="text-sm mb-3">
-                {item.in_stock ? <span className="text-green-600">In Stock</span> : <span className="text-red-500">Out of Stock</span>}
+                {item.in_stock ? <span className="text-green-700">In Stock</span> : <span className="text-red-600">Out of Stock</span>}
               </div>
 
               {/* BUTTON */}
@@ -139,7 +146,7 @@ const PopularProductsSlider = ({ popularProducts, toggleWishlist, wishlistIds, h
                   }}
                   disabled={!item.in_stock}
                   className={`w-1/2 py-2 text-sm rounded-lg font-semibold transition ${
-                    item.in_stock ? "bg-orange-500 text-white hover:bg-orange-600" : "bg-gray-400 text-white cursor-not-allowed"
+                    item.in_stock ? "bg-orange-700 text-white hover:bg-orange-800" : "bg-gray-400 text-white cursor-not-allowed"
                   }`}
                 >
                   Add to Cart
@@ -164,7 +171,7 @@ const PopularProductsSlider = ({ popularProducts, toggleWishlist, wishlistIds, h
                   disabled={!item.in_stock}
                   className={`w-1/2 py-2 text-sm rounded-lg font-semibold border transition ${
                     item.in_stock
-                      ? "bg-white text-orange-500 border-orange-500 hover:bg-orange-50"
+                      ? "bg-white text-orange-700 border-orange-700 hover:bg-orange-50"
                       : "bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed"
                   }`}
                 >
@@ -188,6 +195,7 @@ const PopularProductsSlider = ({ popularProducts, toggleWishlist, wishlistIds, h
 
         <div className="flex gap-2">
           <button
+            aria-label="Previous"
             onClick={() => sliderRef.current?.slickPrev()}
             className="w-9 h-9 bg-gray-100 rounded-lg flex items-center justify-center"
           >
@@ -195,6 +203,7 @@ const PopularProductsSlider = ({ popularProducts, toggleWishlist, wishlistIds, h
           </button>
 
           <button
+            aria-label="Next"
             onClick={() => sliderRef.current?.slickNext()}
             className="w-9 h-9 bg-gray-100 rounded-lg flex items-center justify-center"
           >
@@ -217,8 +226,8 @@ const PopularProductsSlider = ({ popularProducts, toggleWishlist, wishlistIds, h
           />
         </button>
 
-        <div className="p-4">
-          <Slider ref={sliderRef} {...settings}>
+        <div className="p-4" ref={mobileWrapRef}>
+          <Slider ref={sliderRef} {...settings} {...mobileInertProps}>
             {renderProducts()}
           </Slider>
         </div>
@@ -237,8 +246,8 @@ const PopularProductsSlider = ({ popularProducts, toggleWishlist, wishlistIds, h
           />
         </button>
 
-        <div className="col-span-4 p-4 min-w-0">
-          <Slider ref={sliderRef} {...settings}>
+        <div className="col-span-4 p-4 min-w-0" ref={desktopWrapRef}>
+          <Slider ref={sliderRef} {...settings} {...desktopInertProps}>
             {renderProducts()}
           </Slider>
         </div>

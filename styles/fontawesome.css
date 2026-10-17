@@ -1,0 +1,76 @@
+/*!
+ * Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com
+ * License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
+ * Copyright 2025 Fonticons, Inc.
+ *
+ * Trimmed to the icons the site uses, with fonts subset to match
+ * (scripts/fa-subset.py). A new icon needs a rule below AND a re-run of that
+ * script — otherwise it renders as an empty box.
+ */
+@font-face {
+  font-family: "Font Awesome 7 Free";
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url("./fa/fa-solid-900.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Font Awesome 7 Free";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fa/fa-regular-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Font Awesome 7 Brands";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fa/fa-brands-400.woff2") format("woff2");
+}
+
+.fa-solid,
+.fa-regular,
+.fa-brands {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  display: inline-block;
+  font-family: "Font Awesome 7 Free";
+  font-style: normal;
+  font-variant: normal;
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+  text-rendering: auto;
+  width: 1.25em;
+}
+.fa-regular {
+  font-weight: 400;
+}
+.fa-brands {
+  font-family: "Font Awesome 7 Brands";
+  font-weight: 400;
+}
+:is(.fa-solid, .fa-regular, .fa-brands)::before {
+  content: var(--fa);
+}
+
+.fa-angle-down { --fa: "\f107"; }
+.fa-angle-left { --fa: "\f104"; }
+.fa-angle-right { --fa: "\f105"; }
+.fa-angles-right { --fa: "\f101"; }
+.fa-arrow-right { --fa: "\f061"; }
+.fa-bag-shopping { --fa: "\f290"; }
+.fa-bars { --fa: "\f0c9"; }
+.fa-envelope { --fa: "\f0e0"; }
+.fa-eye { --fa: "\f06e"; }
+.fa-heart { --fa: "\f004"; }
+.fa-layer-group { --fa: "\f5fd"; }
+.fa-location-dot { --fa: "\f3c5"; }
+.fa-magnifying-glass { --fa: "\f002"; }
+.fa-phone { --fa: "\f095"; }
+.fa-sliders { --fa: "\f1de"; }
+.fa-thumbs-up { --fa: "\f164"; }
+.fa-user { --fa: "\f007"; }
+.fa-facebook-f { --fa: "\f39e"; }
+.fa-instagram { --fa: "\f16d"; }

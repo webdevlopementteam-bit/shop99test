@@ -103,13 +103,13 @@ export default function Wishlist() {
                 </div>
 
                 {/* Product Info */}
-                <h4 className="font-semibold mb-2 line-clamp-2 text-sm sm:text-base">{product.name}</h4>
+                <h3 className="font-semibold mb-2 line-clamp-2 text-sm sm:text-base">{product.name}</h3>
 
                 <div className="mb-4 flex items-center gap-2 text-sm sm:text-base">
                   {pricing.hasDiscount && pricing.oldPrice != null && (
-                    <span className="text-gray-400 line-through">₹{pricing.oldPrice.toFixed(2)}</span>
+                    <span className="text-gray-500 line-through">₹{pricing.oldPrice.toFixed(2)}</span>
                   )}
-                  <span className="text-red-500 font-bold">₹{pricing.finalPrice.toFixed(2)}</span>
+                  <span className="text-red-600 font-bold">₹{pricing.finalPrice.toFixed(2)}</span>
                 </div>
 
                 {/* Buttons */}

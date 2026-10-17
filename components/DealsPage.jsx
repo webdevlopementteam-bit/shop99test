@@ -10,6 +10,7 @@ import { countProductVariantsInPayload } from "@/lib/productVariants";
 import { getProductDisplayPricing } from "@/lib/productPricing";
 import { setNavState } from "@/lib/navState";
 import { getUserToken } from "@/lib/authSession";
+import { optimizedSrc, responsiveImage } from "@/lib/imageUrl";
 
 const dealsBanner = "/assets/banner/banner-3.png";
 
@@ -224,9 +225,14 @@ export default function DealsPage({
 
             <div className="flex h-36 w-full items-center justify-center rounded-xl bg-slate-50/80 sm:h-36">
               <img
-                src={product.image ? `${BASE_URL}/uploads/${product.image}` : "/no-image.png"}
+                // ~128px tall: a 384px WebP covers high-DPR phones.
+                src={optimizedSrc(product.image ? `${BASE_URL}/uploads/${product.image}` : "/no-image.png", 384)}
                 alt={product.name || "Product"}
-                className="h-32 max-h-full object-contain transition-transform duration-300 group-hover:scale-105"
+                width={384}
+                height={384}
+                loading="lazy"
+                decoding="async"
+                className="h-32 w-auto max-h-full object-contain transition-transform duration-300 group-hover:scale-105"
               />
             </div>
           </div>
@@ -238,19 +244,20 @@ export default function DealsPage({
                 Ends in {timerLeft}
               </p>
             )}
-            {timerLeft === "Expired" && <p className="mb-1 text-xs font-medium text-slate-400">Offer ended</p>}
+            {timerLeft === "Expired" && <p className="mb-1 text-xs font-medium text-slate-500">Offer ended</p>}
 
-            <h4 className="line-clamp-2 font-semibold text-slate-900 sm:text-lg">{product.name}</h4>
+            <h3 className="line-clamp-2 font-semibold text-slate-900 sm:text-lg">{product.name}</h3>
 
             <p className="mt-2 mb-1">
-              {oldPrice != null && <del className="mr-2 text-sm text-slate-400">₹{oldPrice.toFixed(2)}</del>}
-              <span className="text-lg font-bold text-orange-600">₹{Math.max(finalPrice, 0).toFixed(2)}</span>
+              {oldPrice != null && <del className="mr-2 text-sm text-slate-500">₹{oldPrice.toFixed(2)}</del>}
+              <span className="text-lg font-bold text-orange-700">₹{Math.max(finalPrice, 0).toFixed(2)}</span>
             </p>
 
             <div className="mt-2 overflow-hidden transition-all duration-300 sm:max-h-0 sm:opacity-0 sm:group-hover:max-h-40 sm:group-hover:opacity-100">
               <div className="flex flex-col items-center gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:gap-6">
                 <div className="flex gap-3">
                   <button
+                    aria-label="Add to cart"
                     type="button"
                     className="icon-btn"
                     onClick={(e) => {
@@ -262,6 +269,7 @@ export default function DealsPage({
                     <i className="fa-solid fa-bag-shopping" />
                   </button>
                   <button
+                    aria-label="Wishlist"
                     type="button"
                     className="icon-btn"
                     onClick={(e) => {
@@ -300,7 +308,13 @@ export default function DealsPage({
       <div className="min-h-screen bg-gradient-to-b from-slate-100 to-slate-50 pb-12 pt-6 sm:pt-8">
         <div className="mx-auto max-w-7xl px-4">
           <div className="relative mb-8 overflow-hidden rounded-2xl shadow-lg">
-            <img src={dealsBanner} alt="Latest deals" className="h-48 w-full object-cover md:h-64" />
+            <img
+              {...responsiveImage(dealsBanner, { sizes: "100vw" })}
+              alt="Latest deals"
+              width={1920}
+              height={256}
+              className="h-48 w-full object-cover md:h-64"
+            />
             <div className="absolute inset-0 bg-gradient-to-r from-[#0B3C5D]/85 to-[#0B3C5D]/40" />
             <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center text-white">
               <div className="mb-2 flex items-center gap-2 text-amber-200">

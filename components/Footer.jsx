@@ -11,6 +11,7 @@ import {
 } from "@/lib/api";
 import { toast } from "react-toastify";
 import { getUserToken } from "@/lib/authSession";
+import { optimizedSrc } from "@/lib/imageUrl";
 
 export default function Footer() {
   const [footer, setFooter] = useState(null);
@@ -156,8 +157,10 @@ export default function Footer() {
           <div>
             <Link href="/">
               <img
-                src={`${IMAGE_URL}${footer.logo}`}
-                alt="logo"
+                src={optimizedSrc(`${IMAGE_URL}${footer.logo}`, 384)}
+                alt="Shop99"
+                loading="lazy"
+                decoding="async"
                 className="h-14 mb-5 object-contain"
               />
             </Link>
@@ -193,7 +196,7 @@ export default function Footer() {
 
           {/* CONTACT */}
           <div>
-            <h4 className="text-white font-semibold mb-5 text-lg">Contact Info</h4>
+            <h2 className="text-white font-semibold mb-5 text-lg">Contact Info</h2>
 
             <p className="mb-4 text-white">{footer.contact?.address}</p>
 
@@ -222,7 +225,7 @@ export default function Footer() {
 
           {/* SOCIAL */}
           <div>
-            <h4 className="text-white font-semibold mb-5 text-lg">Social Media</h4>
+            <h2 className="text-white font-semibold mb-5 text-lg">Social Media</h2>
             <div className="space-y-3">
               {/* SOUND BOSS */}
               <div className="flex items-center justify-between">
@@ -234,6 +237,7 @@ export default function Footer() {
                       href={footer.socials.soundboss.instagram}
                       target="_blank"
                       rel="noreferrer"
+                      aria-label="Sound Boss on Instagram"
                       className="w-10 h-10 rounded-full border border-white-600 flex items-center justify-center hover:bg-orange-500 transition"
                     >
                       <i className="fa-brands fa-instagram text-white"></i>
@@ -245,6 +249,7 @@ export default function Footer() {
                       href={footer.socials.soundboss.facebook}
                       target="_blank"
                       rel="noreferrer"
+                      aria-label="Sound Boss on Facebook"
                       className="w-10 h-10 rounded-full border border-gray-600 flex items-center justify-center hover:bg-orange-500 transition"
                     >
                       <i className="fa-brands fa-facebook-f text-white"></i>
@@ -263,6 +268,7 @@ export default function Footer() {
                       href={footer.socials.soundfire.instagram}
                       target="_blank"
                       rel="noreferrer"
+                      aria-label="Sound Fire on Instagram"
                       className="w-10 h-10 rounded-full border border-gray-600 flex items-center justify-center hover:bg-orange-500 transition"
                     >
                       <i className="fa-brands fa-instagram text-white"></i>
@@ -274,6 +280,7 @@ export default function Footer() {
                       href={footer.socials.soundfire.facebook}
                       target="_blank"
                       rel="noreferrer"
+                      aria-label="Sound Fire on Facebook"
                       className="w-10 h-10 rounded-full border border-gray-600 flex items-center justify-center hover:bg-orange-500 transition"
                     >
                       <i className="fa-brands fa-facebook-f text-white"></i>
@@ -302,7 +309,7 @@ export default function Footer() {
 function FooterColumn({ title, links }) {
   return (
     <div>
-      <h4 className="text-white font-semibold mb-5 text-lg">{title}</h4>
+      <h2 className="text-white font-semibold mb-5 text-lg">{title}</h2>
 
       <ul className="space-y-3">
         {links?.map((link, index) => (

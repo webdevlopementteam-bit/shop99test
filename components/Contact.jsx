@@ -89,7 +89,7 @@ function InfoCard({ icon, title, text }) {
       </div>
 
       <div className="flex-1 flex flex-col justify-center">
-        <h4 className="font-semibold text-lg mb-1">{title}</h4>
+        <h3 className="font-semibold text-lg mb-1">{title}</h3>
         <p className="text-gray-500 text-sm leading-relaxed">{text}</p>
       </div>
     </div>

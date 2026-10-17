@@ -140,6 +140,7 @@ export default function MostSellingProducts() {
                     />
                     <div className="absolute left-1/2 -translate-x-1/2 bottom-4 flex gap-2 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition duration-300">
                       <button
+                        aria-label="Preview image"
                         onClick={(e) => {
                           e.stopPropagation();
                           setPreviewImage(imageUrl);
@@ -149,6 +150,7 @@ export default function MostSellingProducts() {
                         <i className="fa-solid fa-eye"></i>
                       </button>
                       <button
+                        aria-label="Wishlist"
                         onClick={(e) => {
                           e.stopPropagation();
                           toggleWishlist(item.id);
@@ -164,11 +166,11 @@ export default function MostSellingProducts() {
                   <h3 className="font-semibold text-sm line-clamp-2 mt-1">{item.name}</h3>
                   <p className="mt-2 flex flex-wrap items-center gap-2">
                     {pricing.hasDiscount && pricing.oldPrice != null && (
-                      <del className="text-gray-400 text-sm">₹{pricing.oldPrice.toFixed(2)}</del>
+                      <del className="text-gray-500 text-sm">₹{pricing.oldPrice.toFixed(2)}</del>
                     )}
-                    <span className="text-red-500 font-bold">₹{pricing.finalPrice.toFixed(2)}</span>
+                    <span className="text-red-600 font-bold">₹{pricing.finalPrice.toFixed(2)}</span>
                     {pricing.hasDiscount && pricing.discountPercent > 0 && (
-                      <span className="text-xs font-medium text-green-600">{pricing.discountPercent}% OFF</span>
+                      <span className="text-xs font-medium text-green-700">{pricing.discountPercent}% OFF</span>
                     )}
                   </p>
                   <button
@@ -178,7 +180,7 @@ export default function MostSellingProducts() {
                     }}
                     disabled={!item.in_stock}
                     className={`mt-3 w-full py-2 rounded-lg text-sm font-semibold ${
-                      item.in_stock ? "bg-orange-500 text-white hover:bg-orange-600" : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      item.in_stock ? "bg-orange-700 text-white hover:bg-orange-800" : "bg-gray-300 text-gray-500 cursor-not-allowed"
                     }`}
                   >
                     {item.in_stock ? "Add to Cart" : "Out of Stock"}
