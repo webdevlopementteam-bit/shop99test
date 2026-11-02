@@ -2,7 +2,7 @@
  * generate-sitemap.mjs
  *
  * Generates a sitemap.xml for the storefront by pulling static pages +
- * dynamic categories/brands/products from the API, and writes it into
+ * dynamic categories/products/blog posts from the API, and writes it into
  * public/sitemap.xml.
  *
  * Ported from frontend/generateSitemap.js — same-origin now (site and API
@@ -46,6 +46,7 @@ const staticPages = [
   { url: "/shop", changefreq: "daily", priority: 0.9 },
   { url: "/about", changefreq: "daily", priority: 0.5 },
   { url: "/contact", changefreq: "daily", priority: 0.5 },
+  { url: "/blog", changefreq: "daily", priority: 0.6 },
 ];
 
 /* ================= URL BUILDERS ================= */
@@ -62,6 +63,17 @@ function buildProductUrl(product) {
 // (lib/buildPageMetadata.js). Old /category/<slug> links 308 here.
 function buildCategoryUrl(category) {
   return `/shop?category=${encodeURIComponent(category.name)}`;
+}
+
+// Same as the blog post's canonical (app/(storefront)/blog/[id]/page.jsx).
+function buildBlogUrl(blog) {
+  return `/blog/${blog.slug || blog.id}`;
+}
+
+/** YYYY-MM-DD of the post's last edit, falling back to today. */
+function blogLastmod(blog, today) {
+  const d = new Date(blog.updated_at || blog.created_at || "");
+  return Number.isNaN(d.getTime()) ? today : d.toISOString().split("T")[0];
 }
 
 
@@ -126,6 +138,11 @@ async function fetchCategories() {
   const json = await safeFetchJson(`${API_BASE_URL}/api/categories`, "categories");
   if (!json) return [];
   return Array.isArray(json.categories) ? json.categories : extractList(json);
+}
+
+async function fetchBlogs() {
+  // GET /api/blogs → plain array of every post, newest first.
+  return extractList(await safeFetchJson(`${API_BASE_URL}/api/blogs`, "blogs"));
 }
 
 
@@ -206,9 +223,22 @@ async function generateSitemap() {
     );
   });
 
+  // Blog posts
+  const blogs = await fetchBlogs();
+  console.log(`📝 Blogs fetched: ${blogs.length}`);
+  blogs.forEach((blog) => {
+    entries.push(
+      urlEntry(`${SITE_URL}${buildBlogUrl(blog)}`, {
+        changefreq: "daily",
+        priority: 0.6,
+        lastmod: blogLastmod(blog, today),
+      })
+    );
+  });
+
   // Don't clobber a good sitemap with a static-pages-only one when the API
   // was unreachable/misconfigured.
-  if (categories.length + products.length === 0) {
+  if (categories.length + products.length + blogs.length === 0) {
     console.warn(`⚠️  No dynamic URLs fetched — keeping existing ${OUTPUT_PATH}`);
     return;
   }
