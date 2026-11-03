@@ -672,6 +672,8 @@ const ProductForm = ({ editId }) => {
     slug: "",
     meta_title: "",
     meta_description: "",
+    meta_keywords: "",
+    image_alts: "",
     sku: "",
     hsn: "",
     fsn: "",
@@ -717,6 +719,8 @@ const ProductForm = ({ editId }) => {
           slug: product.slug ?? "",
           meta_title: product.meta_title ?? "",
           meta_description: product.meta_description ?? "",
+          meta_keywords: product.meta_keywords ?? "",
+          image_alts: product.image_alts ?? "",
           sku: product.sku ?? "",
           hsn: hsnVal,
           fsn: product.fsn ?? "",
@@ -1203,6 +1207,8 @@ const ProductForm = ({ editId }) => {
       fd.append("slug", form.slug.trim());
       fd.append("meta_title", form.meta_title.trim());
       fd.append("meta_description", form.meta_description.trim());
+      fd.append("meta_keywords", form.meta_keywords.trim());
+      fd.append("image_alts", form.image_alts.trim());
       fd.append("sku", form.sku || "");
       fd.append("hsn", form.hsn || "");
       fd.append("fsn", form.fsn || "");
@@ -1566,6 +1572,35 @@ const ProductForm = ({ editId }) => {
               <p className="mt-1 text-xs text-gray-500">
                 Leave blank to auto-generate from the product description
                 (first ~160 characters).
+              </p>
+            </div>
+
+            <div className="sm:col-span-2">
+              <input
+                name="meta_keywords"
+                value={form.meta_keywords}
+                placeholder="Meta Keywords (optional)"
+                onChange={handleChange}
+                className="w-full bg-[#0B0F19] border border-gray-700 p-2 rounded"
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                Comma-separated, e.g. “car stereo, bluetooth car stereo, sound
+                boss”. Leave blank for no keywords tag.
+              </p>
+            </div>
+
+            <div className="sm:col-span-2">
+              <input
+                name="image_alts"
+                value={form.image_alts}
+                placeholder="Image Alt Text (optional)"
+                onChange={handleChange}
+                className="w-full bg-[#0B0F19] border border-gray-700 p-2 rounded"
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                Comma-separated, one alt per image in order — 1st alt for the
+                1st image, 2nd for the 2nd… Enter just one alt to use it on
+                every image. Leave blank to use the product name.
               </p>
             </div>
           </div>

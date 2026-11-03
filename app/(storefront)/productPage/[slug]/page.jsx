@@ -54,11 +54,13 @@ export async function generateMetadata({ params }) {
       ? await findSeoEntry(null, `/productPage/${product.id}`)
       : null);
 
+  const productKeywords = String(product.meta_keywords || "").trim();
+
   const meta = applySeoEntry(
     {
       title,
       description,
-      keywords: String(product.meta_keywords || "").trim() || undefined,
+      keywords: productKeywords || undefined,
       alternates: { canonical },
       openGraph: { title, description, url: canonical, images: image ? [image] : undefined },
     },
@@ -69,6 +71,9 @@ export async function generateMetadata({ params }) {
   // a product's canonical is its slug URL regardless.
   return {
     ...meta,
+    // Keywords set on the product itself (Admin → Products) are the most
+    // specific source, so they win over an Admin → SEO entry's keywords.
+    ...(productKeywords ? { keywords: productKeywords } : {}),
     alternates: { ...meta.alternates, canonical },
     openGraph: { ...meta.openGraph, url: canonical },
   };

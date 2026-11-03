@@ -791,6 +791,20 @@ export default function ProductPage({ slug, initialProduct }) {
   const primaryThumbnails = galleryThumbnails.slice(0, 5);
   const overflowThumbnails = galleryThumbnails.slice(5);
 
+  // Admin → Products → "Image Alt Text": comma-separated, one alt per image in
+  // display order (extra alts are ignored). Images past the list get the first
+  // alt unchanged — one alt for the main image covers all of them. Blank →
+  // the product name on every image.
+  const imageAlts = useMemo(
+    () =>
+      String(product?.image_alts || "")
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean),
+    [product?.image_alts],
+  );
+  const altForImage = (index) => imageAlts[index] || imageAlts[0] || product?.name || "Product image";
+
   // Sirf product URL change par reset — `normalizedVariants` ref har load par badal sakta hai
   // aur user ka Black → Pink wapas jump karwa sakta hai.
   useEffect(() => {
@@ -1167,7 +1181,7 @@ export default function ProductPage({ slug, initialProduct }) {
                   >
                     <img
                       src={img}
-                      alt=""
+                      alt={altForImage(i)}
                       className="w-full h-full object-cover"
                     />
                   </button>
@@ -1179,7 +1193,7 @@ export default function ProductPage({ slug, initialProduct }) {
               <div className="flex min-h-[200px] w-full items-center justify-center rounded-lg bg-gray-50 p-3 sm:min-h-[260px] sm:p-4 md:min-h-[300px] md:p-6 lg:min-h-[320px]">
                 <ZoomableProductImage
                   src={activeImage || mainProductImage || "/no-image.png"}
-                  alt={product.name}
+                  alt={altForImage(Math.max(0, displayImages.indexOf(activeImage || mainProductImage)))}
                 />
               </div>
 
@@ -1210,7 +1224,7 @@ export default function ProductPage({ slug, initialProduct }) {
                       >
                         <img
                           src={img}
-                          alt=""
+                          alt={altForImage(i)}
                           className="w-full h-full object-cover"
                         />
                       </button>
@@ -1254,7 +1268,7 @@ export default function ProductPage({ slug, initialProduct }) {
                       >
                         <img
                           src={img}
-                          alt=""
+                          alt={altForImage(i + 5)}
                           className="w-full h-full object-cover"
                         />
                       </button>

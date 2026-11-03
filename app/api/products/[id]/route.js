@@ -15,6 +15,7 @@ import sequelize from "@/lib/db.js";
 import { saveUploadedFile, saveUploadedFiles } from "@/lib/upload.js";
 import { syncProductShipping, getShippingStateRatesObject } from "@/lib/services/shippingSync.js";
 import { buildMetaDescription } from "@/lib/utils/slugify.js";
+import { getProductSeoExtras, saveProductSeoExtras } from "@/lib/productSeo.js";
 import {
   bodyHasShipping,
   firstNonEmptyVariantDescription,
@@ -102,10 +103,12 @@ export async function GET(request, { params }) {
       })) || [];
 
     const shipping_state_rates = await getShippingStateRatesObject(product.id);
+    const seoExtras = await getProductSeoExtras(product.id);
     const pj = product.toJSON();
 
     return Response.json({
       ...pj,
+      ...seoExtras,
       attributes: formattedAttributes,
       variants: formattedVariants,
       specifications:
@@ -247,6 +250,8 @@ async function handlePUT(request, { params }) {
     if (bodyHasShipping(body)) {
       await syncProductShipping(productId, body);
     }
+
+    await saveProductSeoExtras(productId, body);
 
     return Response.json({ success: true });
   } catch (err) {

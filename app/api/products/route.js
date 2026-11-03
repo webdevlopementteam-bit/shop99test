@@ -16,6 +16,7 @@ import sequelize from "@/lib/db.js";
 import { saveUploadedFile, saveUploadedFiles } from "@/lib/upload.js";
 import { syncProductShipping } from "@/lib/services/shippingSync.js";
 import { buildMetaDescription } from "@/lib/utils/slugify.js";
+import { saveProductSeoExtras } from "@/lib/productSeo.js";
 import {
   bodyHasShipping,
   firstNonEmptyVariantDescription,
@@ -248,6 +249,8 @@ async function handlePOST(request) {
     if (bodyHasShipping(body)) {
       await syncProductShipping(product.id, body);
     }
+
+    await saveProductSeoExtras(product.id, body);
 
     return Response.json({ success: true, data: product });
   } catch (err) {
